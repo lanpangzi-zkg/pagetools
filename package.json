@@ -1,0 +1,23 @@
+{
+  "name": "pagetools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/putaomogu/pagetools.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/putaomogu/pagetools/issues"
+  },
+  "homepage": "https://github.com/putaomogu/pagetools#readme",
+  "dependencies": {
+    "koa": "^2.7.0"
+  }
+}
