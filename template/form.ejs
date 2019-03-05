@@ -1,0 +1,33 @@
+                <Form onSubmit={this.onSubmit} layout="inline">
+                    <Row gutter={{ md: 8, lg: 24, xl: 48 }}><% -%>
+                    <% configs.formItemArr.forEach(function(config, i){ -%>
+                        <% const { label, name, colSpan = 8, colIndex, type, cellStyles = {}, singleRow = false, hasLinkage } = config; -%>
+                        <% if(type === 'Btn') { %>
+                        <Col md={<%= colSpan %>} sm={24} key="col-<%= colIndex %>">
+                            <FormItem style={<%- JSON.stringify(cellStyles) %>}>
+                                <%- renderButton(config) %>
+                            </FormItem>
+                        </Col>
+                    <% } -%>
+                    <% if(!name) { -%>
+                    <%    return null;-%>
+                    <% } -%>
+                    <% if (hasLinkage === '1') { -%>
+                        <% const { linkName, condition } = config; -%>
+                        <% if (form.getFieldValue(linkName) !== condition) { -%>
+                            <%  return null; -%>
+                        <% } -%>
+                    <% } %>
+                        <Col md={<%= colSpan %>} sm={24} key="col-<%= colIndex %>" style={this.getColDisplay(<%= i %>)}>
+                            <FormItem label="<%= label %>" style={<%- JSON.stringify(cellStyles) %>}>
+                                {getFieldDecorator("<%= name %>", {
+                                    rules: [],
+                                    initialValue: <%- getInitialValue(config) || '' %>,
+                                })(
+                                    <%- renderItemComponent(config) %>
+                                )}
+                            </FormItem>
+                        </Col><% -%>
+                    <% }); %>
+                    </Row>
+                </Form>
