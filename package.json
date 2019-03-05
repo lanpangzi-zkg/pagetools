@@ -19,5 +19,8 @@
   "homepage": "https://github.com/putaomogu/pagetools#readme",
   "dependencies": {
     "koa": "^2.7.0"
+  },
+  "engines": {
+    "node": "8.9.3"
   }
 }
