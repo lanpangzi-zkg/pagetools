@@ -1,1 +1,10 @@
-<div class="fulu-cell-box"></div>
+                <div class="fulu-cell-box" style={<%- JSON.stringify(configs.boxStyles) %>}><%_ _%>
+                    <%_ const width = `${100 / configs.layoutColumn}%`; -%>
+                    <%_ configs.cellsArr.forEach(function(config, i) { -%>
+                        <% if (i !== 0) { -%><%_ _%><% } %>
+                    <div className="cell" style={<%- JSON.stringify({ width }) %>}>
+                        <%- renderItemComponent(config) %>
+                    </div><%_ _%>
+                <% }) %>
+                </div>
+                

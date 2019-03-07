@@ -1,89 +1,146 @@
-const renderItemComponent = (config) => {
-    const { placeholder = '', type = 'Input' } = config;
-    let itemComponent = null;
+const renderItemComponent = (dropConfig) => {
+    const { placeholder = '', type = 'Input' } = dropConfig;
+    let component = null;
+    if (!Object.hasOwnProperty.call(dropConfig, 'type')) {
+        return component;
+    }
     switch(type) {
+        case 'Text':
+            component = renderText(dropConfig);
+            break;
+        case 'Breadcrumb':
+            component = renderBreadcrumb(dropConfig);
+            break;
         case 'Select':
-            itemComponent = renderSelect(config);
+            component = renderSelect(dropConfig);
             break;
         case 'RangePicker':
-            itemComponent = renderRangePicker(config);
+            component = renderRangePicker(dropConfig);
             break;
         case 'DatePicker':
-            itemComponent = renderDatePicker(config);
+            component = renderDatePicker(dropConfig);
             break;
         case 'Radio':
-            itemComponent = renderRadio(config);
+            component = renderRadio(dropConfig);
             break;
         case 'Checkbox':
-            itemComponent = renderCheckbox(config);
+            component = renderCheckbox(dropConfig);
+            break;
+        case 'Tabs':
+            component = renderTabs(dropConfig);
+            break;
+        case 'Btn':
+            component = renderBtn(dropConfig);
             break;
         default:
-            itemComponent = `<Input placeholder="${placeholder}" />`;
+            component = `<Input placeholder="${placeholder}" />`;
             break;
     }
-    return itemComponent; 
+    return component;
 };
-
+const renderText = (config) => {
+    const { text, style } = config;
+                            return `<span style={${JSON.stringify(style)}}>${text}</span>`;
+};
+const renderBtn = (config) => {
+    const { btnArr } = config;
+                            return `<Fragment>
+                                    ${
+                                        btnArr.map((btn) => {
+                                            const { btnText = 'button', expandFlag, expandCount,
+                                                style = {}, index } = btn;
+                                            const k = `btn-${index}`;
+                                            return `<Button
+                                                    key="${k}"
+                                                    style={${JSON.stringify(style)}}
+                                                >
+                                                    ${btnText}
+                                                </Button>
+                                            `;
+                                        })
+                                    }
+                                </Fragment>`;
+}
+const renderBreadcrumb = (config) => {
+    const { breadcrumbArr = [], style = {} } = config;
+                            return `<Breadcrumb style={${JSON.stringify(style)}}>
+                                    ${
+                                        breadcrumbArr.map(({ label, value }, i) => {
+                                        const k = `breadcrumb-${i}`;
+                                return `<Breadcrumb.Item key="${k}">
+                                            ${ value ? 
+                                            `<a href="${value}">${label}</a>` :
+                                            `<span>${label}</span>`
+                                            }
+                                    </Breadcrumb.Item>
+                                            `;
+                                        }).join('')
+                                }
+                        </Breadcrumb>`;
+};
 const renderSelect = (config) => {
-    const { style = {}, options = [] } = config;
+    const { style = {}, selectArr = [] } = config;
     const selectStyle = Object.assign({ width: '100%'}, style);
                             return `<Select style={${JSON.stringify(selectStyle)}}>
-                                ${Array.isArray(options) ? options.map(({ key, optionValue, optionText }) => {
-                                return `<Option
-                                            key="${key || optionValue}"
-                                            value="${optionValue}"
-                                            style={${JSON.stringify(style)}}
+                                    ${
+                                        Array.isArray(selectArr) ? selectArr.map(({ key, label, value }) => {
+                                            return `<Option
+                                            key="${key || value}"
+                                            value="${value}"
                                         >
-                                            ${optionText}
-                                        </Option>`;
+                                            ${label}
+                                        </Option>
+                                        `;
                                         }).join('') : null
                                 }
                                     </Select>`;
 };
 
+const renderTabs = (config) => {
+    const { style = {}, tabsArr = [] } = config;
+                            return `<Tabs style={${JSON.stringify(style)}}>
+                                        ${Array.isArray(tabsArr) ? tabsArr.map(({ key, label, value }) => {
+                                            return `<TabPane
+                                                    key="${key || value}"}
+                                                    tab="${label}"
+                                                >
+                                                </TabPane>
+                                                `;
+                                        }).join('') : null
+                                 }
+                                    </Tabs>`;
+};
+
 const renderRadio = (config) => {
-    const { style = {}, radios = [] } = config;
-    return `<Radio.Group style={${JSON.stringify(style)}>
-            ${
-                Array.isArray(radios) ? radios.map(({ key, radioValue, radioText }) => {
-                    return `(
-                        <Radio
-                            key="${key || radioValue}"
-                            value="${radioValue}"
-                            style={${JSON.stringify(style)}}
-                        >
-                            ${radioText}
-                        </Radio>
-                    )`;
-                }) : null
-            }
-        </Radio.Group>`;
+    const { style = {}, radioArr = [] } = config;
+                            return `<Radio.Group style={${JSON.stringify(style)}>
+                                    ${
+                                        Array.isArray(radioArr) ? radioArr.map(({ key, label, value }) => {
+                                            return `<Radio
+                                                    key="${key || value}"
+                                                    value="${value}"
+                                                >
+                                                    ${label}
+                                                </Radio>
+                                                `;
+                                        }).join('') : null
+                                    }
+                                </Radio.Group>`;
 };
 const renderCheckbox = (config) => {
-    const { style = {}, cks = [] } = config;
+    const { style = {}, checkboxArr = [] } = config;
     const ckStyle = Object.assign({ width: '100%'}, style);
-    return `<Checkbox.Group style={${JSON.stringify(ckStyle)}}>
-            ${
-                Array.isArray(cks) ? cks.map(({ key, ckValue, ckText }) => {
-                    return `(
-                        <Checkbox
-                            key="${key || ckValue}"
-                            value="${ckValue}"
-                            style={${JSON.stringify(style)}}
-                        >
-                            ${ckText}
-                        </Checkbox>
-                    )`;
-                }) : null
-            }
-        </Checkbox.Group>`;
+    const optionsStr = JSON.stringify(checkboxArr);
+                            return `<CheckboxGroup options={${optionsStr}} style={${JSON.stringify(ckStyle)} />`;
 };
 const renderDatePicker = (config) => {
-                            return `<DatePicker style={{ width: '100%' }} />`;
+    const { showTime = false, format } = config;
+                            return `<DatePicker style={{ width: '100%' }}  showTime="${showTime}" format="${format}" />`;
 };
 
 const renderRangePicker = (config) => {
-                            return `<RangePicker style={{ width: '100%' }} />`;
+    const { showTime = false, format } = config;
+                            return `<RangePicker style={{ width: '100%' }} showTime="${showTime}" format="${format}" />`;
 }
 
 module.exports = renderItemComponent;

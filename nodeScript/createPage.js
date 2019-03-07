@@ -7,7 +7,7 @@ const renderButton = require('../template/function/renderButton');
 
 const sourceDir = path.resolve(__dirname, '../sourceCache');
 
-const createPage = async ({ pageName, layoutConfig }) => {
+const createPage = async ({ pageName, layoutConfig, extraData = {} }) => {
     fs.ensureDirSync(sourceDir);
     process.chdir(sourceDir);
     const fileName = `${pageName}.js`;
@@ -17,6 +17,7 @@ const createPage = async ({ pageName, layoutConfig }) => {
     return await new Promise((resolve, reject) => {
         ejs.renderFile(templateFile, {
                 pageName,
+                extraData,
                 layoutConfig,
                 renderButton,
                 getInitialValue,
@@ -27,6 +28,7 @@ const createPage = async ({ pageName, layoutConfig }) => {
                     info: '生成页面成功',
                 };
                 if(err) {
+                    console.log(err);
                     msgObj.code = 0;
                     msgObj.info = '页面生成失败:' + JSON.stringify(err);
                 } else {

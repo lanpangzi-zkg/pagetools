@@ -1,17 +1,33 @@
 import React, { Component, Fragment } from 'react';
-import { Button, Form, Table, Input, Icon, Select, Row, Col, DatePicker } from 'antd';
-import moment from 'monent';
-import './index.less';
-
-const { RangePicker } = DatePicker;
-const { Option } = Select;
-const FormItem = Form.Item;
+import { 
+    <%- extraData.hasBtn ? 'Button,' : '' %><%- extraData.hasForm ? 'Form,' : '' %><%- extraData.hasTable ? 'Table,' : '' %><%- extraData.hasInput ? 'Input,' : '' %><%- extraData.hasIcon ? 'Icon,' : '' %><%- extraData.hasSelect ? 'Select,' : '' %><%- extraData.hasForm ? 'Row,' : '' %>
+    <%- extraData.hasForm ? 'Col,' : '' %><%- extraData.hasDatePicker ? 'DatePicker' : '' %>
+} from 'antd';
+<% if (extraData.hasRangePicker || extraData.hasDatePicker) { -%>
+<%- "import moment from 'monent';" %>
+<% } -%>
+<% if (extraData.hasRangePicker) { -%>
+<%- 'const { RangePicker } = DatePicker;' %>
+<% } -%>
+<% if (extraData.hasSelect) { -%>
+<%- 'const { Option } = Select;' %>
+<% } -%>
+<% if (extraData.hasForm) { -%>
+<%- 'const FormItem = Form.Item;' %>
+<% } -%>
 
 class <%= pageName %> extends Component {
     constructor(props) {
         super(props);
+        <% if (extraData.hasForm) { %>
         this.onSubmit = this.onSubmit.bind(this);
+        <% } %>
+        <% if (extraData.hasExpand) { %>
+        this.onCollapse = this.onCollapse.bind(this);
+        this.state = { expand: false, expandCount: <%= extraData.expandCount %> };
+        <% } %>
     }
+    <% if (extraData.hasForm) { %>
     onSubmit(e) {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
@@ -19,6 +35,12 @@ class <%= pageName %> extends Component {
                 // add code here...
             }
         });
+    }
+    <% } -%>
+    <% if (extraData.hasExpand) { %>
+    onCollapse() {
+        const { expand = false } = this.state;
+        this.setState({ expand: !expand });
     }
     getColDisplay(i) {
         const displayStyle = { display: 'block' };
@@ -30,16 +52,22 @@ class <%= pageName %> extends Component {
         }
         return displayStyle;
     }
+    <% } %>
     render() {
         const { form } = this.props;
         const { getFieldDecorator } = form;
         return (
             <div className="page-container">
-<% layoutConfig.forEach(function(item){ -%><% if (item.type === 'FormContainer') { -%><%- include('./form', {configs: item.configs, getInitialValue, renderItemComponent, renderButton }); -%><% } %>
-        <% if (item.type === 'TableContainer') { %><%- include('./table', {configs: item.configs}); %><%_ } -%><% }); %>
+<% layoutConfig.forEach(function(item){ -%><% if (item.type === 'FormContainer') { -%><%- include('./form', {configs: item.configs, getInitialValue, renderItemComponent, renderButton }); %><% } %>
+<% if (item.type === 'BoxContainer') { -%><%-include('./box', {configs: item.configs, renderItemComponent }); %><% } %><% if (item.type === 'TableContainer') { %><%- include('./table', {configs: item.configs}); %><%_ } -%><% }); %>
             </div>
         );
     }
 }
 
+<% if (extraData.hasForm) { %>
+export default Form.create()(<%= pageName %>);
+<% } %>
+<% if (!extraData.hasForm) { %>
 export default <%= pageName %>;
+<% } %>
