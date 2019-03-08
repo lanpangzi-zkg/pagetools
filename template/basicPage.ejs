@@ -3,6 +3,7 @@ import {
     <%- extraData.hasBtn ? 'Button,' : '' %><%- extraData.hasForm ? 'Form,' : '' %><%- extraData.hasTable ? 'Table,' : '' %><%- extraData.hasInput ? 'Input,' : '' %><%- extraData.hasIcon ? 'Icon,' : '' %><%- extraData.hasSelect ? 'Select,' : '' %><%- extraData.hasForm ? 'Row,' : '' %>
     <%- extraData.hasForm ? 'Col,' : '' %><%- extraData.hasDatePicker ? 'DatePicker' : '' %>
 } from 'antd';
+
 <% if (extraData.hasRangePicker || extraData.hasDatePicker) { -%>
 <%- "import moment from 'monent';" %>
 <% } -%>
@@ -18,10 +19,10 @@ import {
 
 class <%= pageName %> extends Component {
     constructor(props) {
-        super(props);
+        super(props);<% -%>
         <% if (extraData.hasForm) { %>
-        this.onSubmit = this.onSubmit.bind(this);
-        <% } %>
+        this.onSubmit = this.onSubmit.bind(this);<% -%>
+        <% } -%>
         <% if (extraData.hasExpand) { %>
         this.onCollapse = this.onCollapse.bind(this);
         this.state = { expand: false, expandCount: <%= extraData.expandCount %> };
@@ -53,18 +54,19 @@ class <%= pageName %> extends Component {
         return displayStyle;
     }
     <% } %>
-    render() {
+    render() {<% -%>
+        <% if (extraData.hasForm) { %>
         const { form } = this.props;
         const { getFieldDecorator } = form;
+        <% } %>
         return (
             <div className="page-container">
-<% layoutConfig.forEach(function(item){ -%><% if (item.type === 'FormContainer') { -%><%- include('./form', {configs: item.configs, getInitialValue, renderItemComponent, renderButton }); %><% } %>
+<% layoutConfig.forEach(function(item){ -%><% if (item.type === 'FormContainer') { -%><%- include('./form', {configs: item.configs, extraData, getStyle, hasStyle, getInitialValue, renderItemComponent, renderButton }); %><% } %>
 <% if (item.type === 'BoxContainer') { -%><%-include('./box', {configs: item.configs, renderItemComponent }); %><% } %><% if (item.type === 'TableContainer') { %><%- include('./table', {configs: item.configs}); %><%_ } -%><% }); %>
             </div>
         );
     }
 }
-
 <% if (extraData.hasForm) { %>
 export default Form.create()(<%= pageName %>);
 <% } %>

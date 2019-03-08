@@ -3,8 +3,17 @@
                     <% configs.formItemArr.forEach(function(config, i){ -%>
                         <% const { label, name, colSpan = 8, colIndex, type, cellStyles = {}, singleRow = false, hasLinkage } = config; -%>
                         <% if(type === 'Btn') { %>
-                        <Col md={<%= colSpan %>} sm={24} key="col-<%= colIndex %>">
+                        <Col
+                            md={<%= colSpan %>}
+                            sm={24}
+                            key="col-<%= colIndex %>"
+                        ><% -%>
+                        <%_ if(hasStyle(cellStyles)) { %>
                             <FormItem style={<%- JSON.stringify(cellStyles) %>}>
+                        <% } %>
+                        <%_ if(!hasStyle(cellStyles)) { -%>
+                            <FormItem>
+                        <%_ } %><% -%>
                                 <%- renderButton(config) %>
                             </FormItem>
                         </Col>
@@ -18,8 +27,26 @@
                             <%  return null; -%>
                         <% } -%>
                     <% } %>
-                        <Col md={<%= colSpan %>} sm={24} key="col-<%= colIndex %>" style={this.getColDisplay(<%= i %>)}>
+                    <% if (extraData.hasExpand && expandCount > 0) { -%>
+                        <Col
+                            md={<%= colSpan %>}
+                            sm={24}
+                            key="col-<%= colIndex %>"
+                            style={<%- JSON.stringify(getStyle(extraData, i)) %>}
+                        ><% -%>
+                    <% } else { %>
+                        <Col
+                            md={<%= colSpan %>}
+                            sm={24}
+                            key="col-<%= colIndex %>"
+                        ><% -%>
+                    <% } %><% -%>
+                        <%_ if(hasStyle(cellStyles)) { %>
                             <FormItem label="<%= label %>" style={<%- JSON.stringify(cellStyles) %>}>
+                        <% } %>
+                        <%_ if(!hasStyle(cellStyles)) { -%>
+                            <FormItem label="<%= label %>">
+                        <%_ } %><% -%>
                                 {getFieldDecorator("<%= name %>", {
                                     rules: [],
                                     initialValue: <%- getInitialValue(config) || '' %>,

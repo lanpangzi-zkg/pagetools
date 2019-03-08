@@ -84,7 +84,7 @@ const renderSelect = (config) => {
                             return `<Select style={${JSON.stringify(selectStyle)}}>
                                     ${
                                         Array.isArray(selectArr) ? selectArr.map(({ key, label, value }) => {
-                                            return `<Option
+                                        return `    <Option
                                             key="${key || value}"
                                             value="${value}"
                                         >
@@ -100,12 +100,12 @@ const renderTabs = (config) => {
     const { style = {}, tabsArr = [] } = config;
                             return `<Tabs style={${JSON.stringify(style)}}>
                                         ${Array.isArray(tabsArr) ? tabsArr.map(({ key, label, value }) => {
-                                            return `<TabPane
-                                                    key="${key || value}"}
-                                                    tab="${label}"
-                                                >
-                                                </TabPane>
-                                                `;
+                                            return `    <TabPane
+                                                key="${key || value}"}
+                                                tab="${label}"
+                                            >
+                                            </TabPane>
+                                            `;
                                         }).join('') : null
                                  }
                                     </Tabs>`;
@@ -114,16 +114,15 @@ const renderTabs = (config) => {
 const renderRadio = (config) => {
     const { style = {}, radioArr = [] } = config;
                             return `<Radio.Group style={${JSON.stringify(style)}>
-                                    ${
-                                        Array.isArray(radioArr) ? radioArr.map(({ key, label, value }) => {
-                                            return `<Radio
-                                                    key="${key || value}"
-                                                    value="${value}"
-                                                >
-                                                    ${label}
-                                                </Radio>
-                                                `;
-                                        }).join('') : null
+                                    ${Array.isArray(radioArr) ? radioArr.map(({ key, label, value }) => {
+                                        return `    <Radio
+                                            key="${key || value}"
+                                            value="${value}"
+                                        >
+                                            ${label}
+                                        </Radio>
+                                        `;
+                                    }).join('') : null
                                     }
                                 </Radio.Group>`;
 };
@@ -135,12 +134,12 @@ const renderCheckbox = (config) => {
 };
 const renderDatePicker = (config) => {
     const { showTime = false, format } = config;
-                            return `<DatePicker style={{ width: '100%' }}  showTime="${showTime}" format="${format}" />`;
+                            return `<DatePicker style={{ width: '100%' }}  showTime={${showTime}} format="${format}" />`;
 };
 
 const renderRangePicker = (config) => {
     const { showTime = false, format } = config;
-                            return `<RangePicker style={{ width: '100%' }} showTime="${showTime}" format="${format}" />`;
+                            return `<RangePicker style={{ width: '100%' }} showTime={${showTime}} format="${format}" />`;
 }
 
 module.exports = renderItemComponent;

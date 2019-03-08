@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const ejs = require('ejs');
 const getInitialValue = require('../template/function/getInitialValue');
+const { getStyle, hasStyle } = require('../template/function/styleUtil');
 const renderItemComponent = require('../template/function/renderItemComponent');
 const renderButton = require('../template/function/renderButton');
 
@@ -20,6 +21,8 @@ const createPage = async ({ pageName, layoutConfig, extraData = {} }) => {
                 extraData,
                 layoutConfig,
                 renderButton,
+                getStyle,
+                hasStyle,
                 getInitialValue,
                 renderItemComponent,
             }, (err, data) => {
