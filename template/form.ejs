@@ -1,6 +1,6 @@
                 <Form onSubmit={this.onSubmit} layout="inline">
                     <Row gutter={{ md: 8, lg: 24, xl: 48 }}><% -%>
-                    <% configs.formItemArr.forEach(function(config, i){ -%>
+                    <% Array.isArray( configs.formItemArr) && configs.formItemArr.forEach(function(config, i){ -%>
                         <% const { label, name, colSpan = 8, colIndex, type, cellStyles = {}, singleRow = false, hasLinkage } = config; -%>
                         <% if(type === 'Btn') { %>
                         <Col
@@ -55,6 +55,6 @@
                                 )}
                             </FormItem>
                         </Col><% -%>
-                    <% }); %>
+                    <% }) %>
                     </Row>
                 </Form>
