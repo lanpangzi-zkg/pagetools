@@ -4,7 +4,7 @@ const http = require('http');
 const https = require('https');
 const certificate = fs.readFileSync('./configs/suuyuu_cn.crt');
 
-function getProxyHeaders(reqUrl, acceptType, cookie, requestData) {
+function getProxyHeaders(reqUrl, method, acceptType, cookie, requestData) {
     const urlObj = url.parse(reqUrl);
     const proxyHeaders = {
         'Origin': urlObj.protocol + '//' + urlObj.host,
@@ -18,7 +18,7 @@ function getProxyHeaders(reqUrl, acceptType, cookie, requestData) {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
     };
-    if (requestData) {
+    if (requestData && method !== 'GET') {
         proxyHeaders['Content-Length'] = Buffer.byteLength(JSON.stringify(requestData));
         proxyHeaders['Content-Type'] = 'application/json;charset=UTF-8';
     }
@@ -35,7 +35,7 @@ function getRquestOptions(reqUrl, path, method = 'POST', acceptType = 'json', co
         port: urlObj.port || 80,
         path: method === 'GET' ? `${path}?${(new url.URLSearchParams(requestData)).toString()}` : path,
         method: method,
-        headers: getProxyHeaders(reqUrl, acceptType, cookie, requestData),
+        headers: getProxyHeaders(reqUrl, method, acceptType, cookie, requestData),
         timeout: 5000,
     };
     if (urlObj.protocol === 'https:' && path !== '/user/login') {
@@ -45,26 +45,10 @@ function getRquestOptions(reqUrl, path, method = 'POST', acceptType = 'json', co
     return options;
 }
 
-function requestCallBack(resolve, res) {
-    let responseData = '';
-    res.on('data', (chunk) => {
-        responseData += chunk;
-    });
-    res.on('end', () => {
-        resolve({ headers: res.headers, body: responseData, statusCode: res.statusCode });
-    });
-}
-
 function sendToClient(ctx, result) {
-    if (result.headers) {
-        Object.keys(result.headers).forEach((k) => {
-          ctx.set(k, result.headers[k]);
-        });
-      }
-      ctx.set('Access-Control-Allow-Origin', '*');
-      ctx.headers = result.headers;
-      ctx.status = result.statusCode;
-      ctx.body = result.body;
+    ctx.headers = result.headers;
+    ctx.status = result.statusCode;
+    ctx.body = result.body;
 }
 
 function getFetchApiOption(ctx) {
@@ -84,9 +68,8 @@ function getFetchApiOption(ctx) {
     return options;
 }
 
-async function porxyRequest(ctx) {
-    const { method = 'POST', params } = ctx.body;
-    const options = getFetchApiOption(ctx);
+async function porxyRequest(ctx, options, params) {
+    const { method = 'POST' } = ctx.body;
     const httpObj = options.cert ? https : http; // 判断协议
     const result = await new Promise((resolve, reject) => {
         const req = httpObj.request(options, (res) => {
@@ -107,9 +90,7 @@ async function porxyRequest(ctx) {
 }
 
 module.exports = {
-    getProxyHeaders,
     getRquestOptions,
-    requestCallBack,
-    sendToClient,
+    getFetchApiOption,
     porxyRequest,
 };
