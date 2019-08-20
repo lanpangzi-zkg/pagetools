@@ -1,0 +1,14 @@
+import service from '../services/<%= pageName %>';
+import { message } from 'antd';
+
+const CODE_SUCCESS = '0';
+
+export default {
+	namespace: '<%= pageName %>',
+	<%- renderModel(fileConfig) %>
+	reducers: {
+		updateState(state, { payload }) {
+			return {...state, ...payload };
+		},
+	},
+};

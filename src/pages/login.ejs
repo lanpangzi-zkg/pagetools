@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录 - 福禄通行证</title>
+    <link href="<%= basePath %>/Content/base2.css?v=1.1.4" rel="stylesheet" />
+    <script src="<%= basePath %>/Scripts/jquery-1.12.3.min.js"></script>
+    <script src="<%= basePath %>/Scripts/common.js?v=1.1.7"></script>
+    <script type="text/javascript">
+        $(function () {
+            setTimeout(function () {
+                $('#hidden-area').remove();
+            }, 1000);
+            $(".tab_content").append($("#tpl_login_phone").html());
+            var username = localStorage.getItem("username");
+            if (username) {
+                $("#username").val(username);
+                $("#remeber").attr("checked", true);
+            }
+            else {
+                $("#remeber").attr("checked", false);
+            }
+
+            // 用户登录
+            $("#userLogin,#bindAccount").click(function () {
+                // 切换动画效果
+                $(this).parent().siblings(".login-type-code").children(".line").animate({ 'width': '0px' }, 0);
+                $(this).siblings('.line').show().css({ "background": '#11161f' }).animate({ 'width': '150px' }, 300);
+                $(".user-login-info").show().siblings(".code-login-info").hide();
+                $(this).addClass("clickStyle").parent().siblings(".login-type-code").children(".code-login").removeClass("clickStyle");
+            });
+            // 二维码登录
+            $("#codeLogin").click(function () {
+                // 切换动画效果
+                $(this).parent().siblings(".login-type-user").children(".line").animate({ 'width': '0px' }, 0);
+                $(this).siblings('.line').show().css({ "background": '#11161f' }).animate({ 'width': '150px' }, 300);
+                $(".code-login-info").show().siblings(".user-login-info").hide();
+                $(this).addClass("clickStyle").parent().siblings(".login-type-user").children(".user-login").removeClass("clickStyle");
+            });
+
+            // 回车登录
+            $(document).keyup(function (event) {
+                if (!$(".user-login-info").is(":hidden")) {
+                    if (event.keyCode == 13) {
+                        $("#btnLogin").click();
+                    }
+                }
+            });
+            /************弹窗代码 start****************/
+            // 绑定弹窗关闭事件
+            $(".modal-cancel").click(function () {
+                var id = $(this).attr('data-id');
+                hideMaskTips(id);
+            });
+
+            // 显示安全提示弹出框
+            function showSecurityTips() {
+                // 登录地址赋值
+                $(function () {
+                    $.ajax({
+                        type: "get",
+                        url: "<%= basePath %>/user/getUserIpInfo",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.code == "0") {
+                                $('.last-address').text(data.data.last_login_address);
+                                $('.current-address').text(data.data.login_address);
+                                showMaskTips('security-tips');
+                            }
+                        },
+                        error: function (e) {
+                            alert(e);
+                        },
+                        complete: function () {
+                        }
+                    });
+                });
+            }
+
+            // 显示验证通过提示弹出框
+            function showValidateSuccessTips() {
+                showMaskTips('validate-success-tips');
+            }
+
+            function hideMaskTips(id) {
+                $(".mask").css("display", "none");
+                $('#' + id).css("display", "none");
+            }
+
+            function showMaskTips(id) {
+                $(".mask").css("display", "block");
+                $('#' + id).css("display", "block");
+            }
+            /*************弹窗代码 end***************/
+            //验证码登录
+            function callback_login_by_code() {
+                $.ajax({
+                    type: "post",
+                    url: "<%= basePath %>/user/sms/login",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify({ Phone: $("#username").val(), Code: $("#iptVerifyCode").val() }),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.code == "0") {
+                        
+                            if ($("#remeber").is(':checked')) {
+                                localStorage.setItem("username", $("#username").val());
+                            } else {
+                                localStorage.removeItem("username");
+                            }
+
+                            var returnUrl = getQueryString("ReturnUrl");
+                            if (!!returnUrl) {
+                                window.location.href = returnUrl;
+                            } else {
+                                window.location.href = "../user/center";
+                            }
+                        } else {
+                            if ($(".login-error").length > 0) {
+                                $(".login-error").css("opacity", "1").text(data.message);
+                            }
+                        }
+                    },
+                    error: function (e) {
+                        //alert(e);
+                    },
+                    complete: function () {
+
+                    }
+                });
+            }
+
+            // 账号密码登录
+            function callback_login() {
+                var remenber = true;
+                if (!$("#remeber").is(':checked')) {
+                    remenber = false;
+                }
+                setMaxDigits(131);
+                var rsaKeyPair = new RSAKeyPair("10001", "", "BB794457D3D1651B3590A294D7A06237709207711EE5C9BDCF9117301B081C00EA62722621A9CB4BD479BF0E7DDFD90D4835B2312D1C41D0287F3AAD618497A260E6B5602D0B0D246BE54342F52864FF1C14A02F59D3DEE79A9866FFFE1796A7EECB7C5DD6074652585E93759BC8B03F1ECEBEC456B12DAEF1513AD3E83078A1");
+                var pass = encryptedString(rsaKeyPair, base64encode($('#password').val()));
+                var appUrl = window.configs.appUrl;
+                var authUrl = window.configs.host.passport.auth;
+                var tokenUrl = window.configs.host.passport.authCode;
+                var clientId = window.configs.clientId;
+                var contentType = "application/json;charset=utf-8";
+                $.ajax({
+                    type: "post",
+                    url: "/user/login2",
+                    contentType: contentType,
+                    data: JSON.stringify({ UserName: $("#username").val(), Password: pass, RememberMe: remenber, authUrl: authUrl }),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.code == "0") {
+                            $.ajax({
+                                type: "post",
+                                url: "/app/auth",
+                                contentType: contentType,
+                                data: JSON.stringify({ clientId: clientId, appUrl: appUrl, authUrl: authUrl, tokenUrl: tokenUrl }),
+                                dataType: "json",
+                                success: function (res) {
+                                    if (res.code !== '0') {
+                                        alert('登录失败');
+                                    } else {
+                                        localStorage.setItem('access_token', res.data.access_token);
+                                        top.window.postMessage(res.data.access_token, '*');
+                                    }
+                                }
+                            });
+                        } else if (data.code == "10028") {
+                            if (remenber) {
+                                localStorage.setItem("username", $("#username").val());
+                            } else {
+                                localStorage.removeItem("username");
+                            }
+                            redirectHoldSearch("<%= basePath %>/user/securityValidate");
+                        } else if (data.code == '20046') { // 电子令牌用户，需要进行二次验证
+                            if (remenber) {
+                                localStorage.setItem("username", $("#username").val());
+                            } else {
+                                localStorage.removeItem("username");
+                            }
+                            redirectHoldSearch("<%= basePath %>/user/validateTwoFactor");
+                        }
+                        else {
+                            //$(".error-mes").css("display", "block");
+                            $(".login-error").css("opacity", 1).text(data.message);
+                        }
+                    },
+                    error: function (e) {
+                        alert(e);
+                    },
+                    complete: function () {
+
+                    }
+
+                });
+            }
+
+            //登录页验证
+            $(".form").on("click", "#btnLogin", function () {
+                var username = $("#username").val();
+                var password = $("#password").val();
+                var code = $("#iptVerifyCode").val();
+                var passwordreg = /^.{6,20}$/; //密码最少6位
+                var dex = $(".tab-select").index();
+                try {
+                    if (!username) {
+                        throw ("手机号不能为空");
+                    }
+                    else if (!/^\d{4,11}$/.test(username)) {
+                        throw ("手机号不合法");
+                    }
+                    else if (dex == 0 && !password) {
+                        throw ("密码不能为空");
+                    }
+                    else if (dex == 1 && !code) {
+                        throw ("验证码不能为空");
+                    }
+                    else if (dex == 0 && !passwordreg.test(password)) {
+                        throw ("请输入6-20位密码");
+                    }
+                    $(".login-error").css("opacity", "0").text();
+
+                    if (dex == 0) {// dex = 0 表示賬號密碼 1表示 驗證碼登錄
+                        callback_login();
+                    }
+                    else {
+                        callback_login_by_code();
+                    }
+                }
+                catch (e) {
+                    if (e) {
+                        $(".login-error").css("opacity", 1).text(e);
+                    }
+                }
+            });
+
+            //倒计时
+            var time = 60;
+            function getVerifyCode(ele) {
+                var timer = setInterval(function () {
+                    if (time >= 0) {
+                        ele.text(time + 's');
+                        time--;
+                    }
+                    else {
+                        ele.removeAttr("disabled");
+                        ele.text('获取验证码');
+                        clearInterval(timer);
+                        time = 60;
+                    }
+                }, 1000);
+            }
+
+            $(".form").on("click", "#getVerifyCode", function () {
+                // 手机号
+                var phone = $("#username").val();
+                if (!phone) {
+                    $(".login-error").css("opacity", 1).text("手机号不能为空");
+                    return;
+                }
+                if (/^1[3-9]{1}\d{9}$/.test(phone)) {
+                    var ele = $(this);
+                    //验证通过请求接口
+                    // 直接生成一个验证码对象
+                    var captcha1 = new TencentCaptcha('2079932958', function (res) {
+                        /* callback */
+                        //console.log(res)
+                        // res（未通过验证）= {ret: 1, ticket: null}
+                        // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
+                        if (res.ret === 0) {
+                            ele.prop("disabled", "disabled");
+                            $.ajax({
+                                type: "post",
+                                url: "<%= basePath %>/user/sms/send",
+                                contentType: "application/json;charset=utf-8",
+                                data: JSON.stringify({ Type: "login", Phone: phone, Ticket: res.ticket, RandStr: res.randstr }),
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.code === "0") {
+                                        getVerifyCode(ele);
+                                    } else {
+                                        //alert(data.message);
+                                        $(".login-error").css("opacity", 1).text(data.message);
+                                        ele.removeAttr("disabled");
+                                    }
+                                },
+                                error: function (e) {
+                                    alert(e);
+                                    ele.removeAttr("disabled");
+                                },
+                                complete: function () {
+                                }
+                            });
+                        }
+                    });
+                    captcha1.show(); // 显示验证码
+                }
+                else {
+                    $(".login-error").css("opacity", 1).text("请输入正确的手机号");
+                }
+
+            });
+
+            $("#btnForgetPwd").click(function () {
+                redirectHoldSearch("../user/forget2");
+            });
+
+            $("#btnRegister").click(function () {
+                redirectHoldSearch("../user/register2");
+            });
+
+            $(".tab-item").click(function () {
+                if ($(this).hasClass("tab-select"))
+                    return;
+
+                $(this).addClass("tab-select").siblings().removeClass("tab-select");
+
+                var dex = $(this).index();
+                $(".tab_content").html("");
+
+                if (dex == 0) {
+                    $(".tab_content").append($("#tpl_login_phone").html());
+                } else if (dex == 1) {
+                    $(".tab_content").append($("#tpl_login_code").html());
+                }
+
+                var username = localStorage.getItem("username");
+                if (username) {
+                    $("#username").val(username);
+                    $("#remeber").attr("checked", true);
+                } else {
+                    $("#remeber").attr("checked", false);
+                }
+            });
+
+            $(".form").on("click", "#btnSecurityValidate", function () {
+                var username = $("#username").val();
+                var code = $("#iptVerifyCode").val();
+                try {
+                    if (!username) {
+                        throw ("手机号不能为空");
+                    }
+                    else if (!/^(1[3-9])\d{9}$/.test(username)) {
+                        throw ("手机号不合法");
+                    }
+                    else if (!code) {
+                        throw ("验证码不能为空");
+                    }
+                    $(".login-error").css("opacity", "0").text();
+                    callbackValidateLogin();
+                }
+                catch (e) {
+                    if (e) {
+                        $(".login-error").css("opacity", 1).text(e);
+                    }
+                }
+            });
+
+            $(".form").on("click", "#btnGetValidateCode", function () {
+                // 手机号
+                var phone = $("#username").val();
+                if (!phone) {
+                    $(".login-error").css("opacity", 1).text("手机号不能为空");
+                    return;
+                }
+                if (/^1[3-9]{1}\d{9}$/.test(phone)) {
+                    var ele = $(this);
+                    //验证通过请求接口
+                    // 直接生成一个验证码对象
+                    var captcha1 = new TencentCaptcha('2079932958', function (res) {
+                        // res（未通过验证）= {ret: 1, ticket: null}
+                        // res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
+                        if (res.ret === 0) {
+                            ele.prop("disabled", "disabled");
+                            $.ajax({
+                                type: "post",
+                                url: "<%= basePath %>/user/sms/send",
+                                contentType: "application/json;charset=utf-8",
+                                data: JSON.stringify({ Type: "login", Phone: phone, Ticket: res.ticket, RandStr: res.randstr }),
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.code === "0") {
+                                        getVerifyCode(ele);
+                                    } else {
+                                        alert(data.message);
+                                        ele.removeAttr("disabled");
+                                    }
+                                },
+                                error: function (e) {
+                                    alert(e);
+                                    ele.removeAttr("disabled");
+                                },
+                                complete: function () {
+                                }
+                            });
+                        }
+                    });
+                    captcha1.show(); // 显示验证码
+                }
+                else {
+                    $(".login-error").css("opacity", 1).text("请输入正确的手机号");
+                }
+
+            });
+
+            //验证码登录
+            function callbackValidateLogin() {
+                $.ajax({
+                    type: "post",
+                    url: "<%= basePath %>/user/sms/login",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify({ Phone: $("#username").val(), Code: $("#iptVerifyCode").val() }),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.code == "0") {
+                            if ($("#remeber").is(':checked')) {
+                                localStorage.setItem("username", $("#username").val());
+                            } else {
+                                localStorage.removeItem("username");
+                            }
+                            showSecurityTips();
+                        } else {
+                            if ($(".login-error").length > 0) {
+                                $(".login-error").css("opacity", "1").text(data.message);
+                            }
+                        }
+                    },
+                    error: function (e) {
+                        //alert(e);
+                    },
+                    complete: function () {
+
+                    }
+                });
+            }
+
+            $("#btnContinue").click(function () {
+                var returnUrl = getQueryString("ReturnUrl");
+                if (!!returnUrl) {
+                    window.location.href = returnUrl;
+                } else {
+                    window.location.href = "../user/center";
+                }
+            });
+        });
+    </script>
+    <script src="<%= basePath %>/Scripts/RSA.min.js"></script>
+</head>
+
+<body>
+    <div class="login">
+        <div style="opacity: 0; position: fixed; z-index: -1;" id="hidden-area">
+            <input type="text" />
+            <input type="password" />
+        </div>
+        <div class="form">
+            <div class="ant-spin-nested-loading">
+                <div class="ant-spin-container">
+                    <div class="user-login-info">
+                        <div class="user-login-content">
+                            <div class="login-hd">
+                                <div class="tab">
+                                    <div class="tab-item tab-select"><span class="line"></span>密码登录</div>
+                                    <div class="tab-item"><span class="line"></span>短信登录</div>
+                                </div>
+                            </div>
+                            <div class="tab_content">
+
+                            </div>
+                            <script type="text/html" id="tpl_login_phone">
+                                <div id="login-info-tip">
+                                    <i class="icon_info" style="margin-right:8px;vertical-align: -2px;"></i>
+                                    <span>该账号已经冻结无法登录</span>
+                                </div>
+                                <div class="user">
+                                    <div class="form-item">
+                                        <h6 class="form-lable">手机号</h6>
+                                        <input class="form-control input-text" type="text" value="" placeholder="请输入手机号" id="username" />
+                                    </div>
+                                </div>
+                                <div class="form-item">
+                                    <h6 class="form-lable">密码</h6>
+                                    <input type="password" class="form-control" value="" placeholder="请输入密码" id="password" />
+                                </div>
+                                <div class="form-item">
+                                    <div class="error-mes login-error" style="opacity:0">手机号或密码输入有误，请重新输入</div>
+                                </div>
+                                <div class="form-item">
+                                    <a href="javascript:void(0)" class="btn_login" id="btnLogin">登录</a>
+                                </div>
+                            </script>
+                            <script type="text/html" id="tpl_login_code">
+                                <div id="login-info-tip">
+                                    <i class="icon_info" style="margin-right:8px;vertical-align: -2px;"></i>
+                                    <span>该账号已经冻结无法登录</span>
+                                </div>
+                                <div class="user">
+                                    <div class="form-item">
+                                        <h6 class="form-lable">手机号</h6>
+                                        <input class="form-control input-text" type="text" value="" placeholder="请输入手机号" id="username" />
+                                    </div>
+                                </div>
+                                <div class="form-item">
+                                    <h6 class="form-lable">验证码</h6>
+                                    <div class="form-item" style="margin-top:0; margin-bottom:0">
+                                        <div class="fl">
+                                            <input class="form-control input-text" style="width:160px" type="text" placeholder="请输入短信验证码" id="iptVerifyCode" />
+                                            <p class="error-mes phone-error">请输入短信验证码</p>
+                                        </div>
+                                        <div class="fr">
+                                            <button type="submit" class="btn_default" id="getVerifyCode">
+                                                <span>获取验证码</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-item">
+                                    <div class="error-mes login-error" style="opacity:0">手机号或密码输入有误，请重新输入</div>
+                                </div>
+                                <div class="form-item">
+                                    <a href="javascript:void(0)" class="btn_login" id="btnLogin">登录</a>
+                                </div>
+
+                            </script>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function receiveMessage(event) {
+            window.configs = event.data;
+        }
+        window.addEventListener('message', receiveMessage, false);
+    </script>
+    <!-- <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script> -->
+</body>
+</html>

@@ -1,11 +1,11 @@
 function getInitialValue(config) {
-    const { type = 'Input', defaultValue, dateFormat = 'YYYY-MM-DD' } = config;
+    const { type = 'Input', initialValue, dateFormat = 'YYYY-MM-DD' } = config;
     if (type === 'DatePicker' || type === 'RangePicker') {
-        if (defaultValue) {
-            return `moment('${defaultValue}', '${dateFormat}')`;
+        if (initialValue) {
+            return `moment('${initialValue}', '${initialValue}')`;
         }
         return "''";
     }
-    return `'${config.defaultValue || ''}'`;
+    return `'${config.initialValue || ''}'`;
 }
 module.exports = getInitialValue;
