@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/putaomogu/pagetools#readme",
   "dependencies": {
+    "compressing": "^1.4.0",
     "ejs": "^2.6.1",
     "fs-extra": "^7.0.1",
     "koa": "^2.7.0",

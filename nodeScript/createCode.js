@@ -1,6 +1,7 @@
 const createFile = require('./createFile');
 const path = require('path');
 const fs = require('fs-extra');
+const compressing = require('compressing');
 
 const getSourceCacheDir = (pageName) => path.resolve(__dirname, '../sourceCache', `${pageName}`);
 
@@ -45,6 +46,9 @@ const createCode = async ({ pageName = 'Page', layoutConfig = [], layerConfig = 
             break;
         }
     }
+    // if (responseObj.code == '0') { // 生成页面成功，压缩文件
+    //     compressing.gzip.compressFile(sourceCacheDir, `${sourceCacheDir}.gz`);
+    // }
     return responseObj;
 };
 
