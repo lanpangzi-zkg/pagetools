@@ -1,20 +1,23 @@
 const { getProps } = require('../function/propsUtil');
 
 const renderButton = (config) => {
-    const { buttonArr = [] } = config;
-    return `<span className="btn-group">
-        ${buttonArr.map((btn) => {
-            const { btnText = 'button', expandFlag = '0' } = btn;
-            if (expandFlag === '1') {
-                return getExpandBtn(btn);
-            } else {
-                return `<Button${getProps(btn, 'Button')}>
-                    ${btnText}
-                </Button>`;
+    const { buttonArr = [], textAlign = 'left', cellStyles = {} } = config;
+    const styleObj = Object.assign({}, cellStyles, { textAlign });
+    return `<div style={${JSON.stringify(styleObj)}}>
+        <span className="btn-group">
+            ${buttonArr.map((btn) => {
+                const { btnText = 'button', expandFlag = '0' } = btn;
+                if (expandFlag === '1') {
+                    return getExpandBtn(btn);
+                } else {
+                    return `<Button${getProps(btn, 'Button')}>
+                        ${btnText}
+                    </Button>`;
+                }
             }
-        }
-    ).join('\n')}
-    </span>`;
+        ).join('\n')}
+        </span>
+    </div>`;
 };
 
 const getExpandBtn = (btnConfig) => {

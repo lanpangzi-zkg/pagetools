@@ -4,7 +4,7 @@ const renderModal = require('./renderModal');
 const renderHeader = require('./renderHeader');
 const renderTable = require('./renderTable');
 
-const renderContainer = (renderConfig) => {
+const renderContainer = (renderConfig, pageName) => {
     const { type, configs } = renderConfig;
     let component = null;
     if (!Object.hasOwnProperty.call(renderConfig, 'type')) {
@@ -18,7 +18,7 @@ const renderContainer = (renderConfig) => {
             component = renderLine();
             break;
         case 'TableContainer':
-            component = renderTable(configs);
+            component = renderTable(configs, pageName);
             break;
         case 'BoxContainer':
             component = renderBox(configs);

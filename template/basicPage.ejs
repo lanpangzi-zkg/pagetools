@@ -1,38 +1,19 @@
 import React, { Component } from 'react';
-<%= importString %>
+<%- importString %>
 
 class <%= pageName %> extends Component {
     constructor(props) {
         super(props);
-        <% if (hasForm) { %>
-        this.onSubmit = this.onSubmit.bind(this);
-        <% } -%>
+        <%- renderConstructor(extraConfig) %>
     }
-    <% if (hasForm) { %>
-    onSubmit(e) {
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                // add code here...
-            }
-        });
-    }
-    <% } -%>
+    <%- renderMethod(extraConfig) %>
     render() {<% -%>
-        <% if (hasForm) { %>
-        const { form } = this.props;
-        const { getFieldDecorator } = form;
-        <% } %>
+        <%- renderProp(extraConfig) %>
         return (
             <div className="fulu-container">
-                <%- renderEnter(fileConfig) %>
+                <%- renderEnter(fileConfig, pageName, true) %>
             </div>
         );
     }
 }
-<% if (hasForm) { %>
-export default Form.create()(<%= pageName %>);
-<% } %>
-<% if (!hasForm) { %>
-export default <%= pageName %>;
-<% } %>
+<%- renderExport(extraConfig) %>

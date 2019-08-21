@@ -1,21 +1,22 @@
 const { getProps } = require('../function/propsUtil');
 const renderButton = require('./renderButton');
 
-const renderFormItem = (config) => {
-    const { name, type, label } = config;
+const renderFormItem = (formItemConfig) => {
+    const { type, configs = {} } = formItemConfig;
     const renderWidget = require('./renderWidget');
     if (type === "Button") {
         return `<FormItem>
-            ${renderButton(config)}
+            ${renderButton(configs)}
         </FormItem>
         `;
     }
+    const { name, label } = configs;
     if (!name) {
         return '';
     }
     return `<FormItem label="${label}">
-            {getFieldDecorator("${name}"${getProps(config, 'FormItem')})(
-                ${renderWidget(config)}
+            {getFieldDecorator("${name}"${getProps(configs, 'FormItem')})(
+                ${renderWidget(formItemConfig)}
             )}
         </FormItem>
     `;
@@ -24,9 +25,9 @@ const renderFormItem = (config) => {
 const renderForm = (configs) => {
     return `<Form onSubmit={this.onSubmit} layout="inline">
                 <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-                    ${Array.isArray(configs.formItemArr) && configs.formItemArr.map((config) => {
-                        return `<Col md={colSpan} sm={24} key="col-${config.colIndex}">
-                                ${renderFormItem(config)}
+                    ${Array.isArray(configs.formItemArr) && configs.formItemArr.map((formItemConfig) => {
+                        return `<Col md={colSpan} sm={24} key="col-${formItemConfig.colIndex}">
+                                ${renderFormItem(formItemConfig)}
                     </Col>
                     `;
                     }).join('')}

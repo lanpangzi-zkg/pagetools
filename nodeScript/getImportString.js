@@ -1,7 +1,13 @@
+let extraConfig = {};
+
 const getImportString = (layoutConfig = [], initImports = []) => {
+    extraConfig = {};
+    const results = new Array(2);
     const antdImportSets = conbine(getAntdImportString(layoutConfig), new Set(initImports));
+    results[1] = Object.assign({}, extraConfig);
     const otherImportSets = getOtherImportString(antdImportSets);
-    return antdImportSets.size > 0 ? "import { " + Array.from(antdImportSets).join(', ') + " }" + `from antd;\n${otherImportSets.join('\n')}` : '';
+    results[0] = (antdImportSets.size > 0 ? "import { " + Array.from(antdImportSets).join(', ') + " } " + `from 'antd';\n${otherImportSets.join('\n')}` : '');
+    return results;
 };
 
 function conbine(setA, setB) {
@@ -16,11 +22,15 @@ const getAntdImportString = (layoutConfig = []) => {
     layoutConfig.forEach((item) => {
         if (item.type === 'FormContainer') {
             antdImportSets.add('Form');
+            extraConfig.form = item.configs;
             const { formItemArr = [] } = item;
             formItemArr.forEach((formItem) => {
                 formItem.type && antdImportSets.add(formItem.type);
             });
         } else if (item.type === 'TableContainer') {
+            if (item.configs.pagination) {
+                extraConfig.table = item.configs;
+            }
             antdImportSets.add('Table');
         } else if (item.type === 'LineContainer') {
             antdImportSets.add('Divider');

@@ -21,7 +21,7 @@ const isEndTag = (line) => {
  * @param {*} line 
  */
 const isEspecialTag = (line) => {
-	return line === '})(' || line === '>';
+	return line === '})(' || line === '>' || matchWithLine(line, /^\}\).+\{$/);
 };
 
 const isWholeBracket = (line) => {
@@ -89,7 +89,7 @@ const getNewLine = (line) => {
 	}
 	const startTag = isStartTag(_line);
 	if (startTag) { // 只包含开始标签
-		tagStack.push({ startTag, lineSpace: curLineSpace });
+		tagStack.push(curLineSpace);
 		curLineSpace++;
 		return addWhiteSpace(_line, curLineSpace - 1);
 	}
@@ -99,13 +99,13 @@ const getNewLine = (line) => {
 	}
 	const endTag = isEndTag(_line);
 	if (endTag) { // 只包含结束标签
-		const { lineSpace = 0 } = tagStack.pop() || {};
+		const lineSpace = tagStack.pop() || 0;
 		curLineSpace = lineSpace;
 		return addWhiteSpace(_line, curLineSpace);
 	}
 	const tagWithWrap = isTagWithWrap(_line);
 	if (tagWithWrap) { // 开始标签折行
-		tagStack.push({ tagWithWrap, lineSpace: curLineSpace });
+		tagStack.push(curLineSpace);
 		curLineSpace++;
 		return addWhiteSpace(_line, curLineSpace - 1);
 	}
@@ -113,6 +113,7 @@ const getNewLine = (line) => {
 };
 
 const beautify = (sourceCacheDir, fileName) => {
+	reset();
 	const copyFileName = `${fileName.slice(0, fileName.lastIndexOf('.'))}Copy.js`;
     const copyFilePath = path.resolve(sourceCacheDir, copyFileName);
     const sourceFilePath = path.resolve(sourceCacheDir, fileName);
@@ -125,14 +126,12 @@ const beautify = (sourceCacheDir, fileName) => {
             }).on('close', () => {
 				fs.unlinkSync(sourceFilePath);
 				fs.renameSync(copyFilePath, sourceFilePath);
-				reset();
                 resolve({
                     code: 0,
                     info: '生成页面成功',
 				});
 			}).on('error', function(e) {
 				console.log('error', e);
-				reset();
                 reject(e);
             });
         });

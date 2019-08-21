@@ -33,7 +33,7 @@ const createCode = async ({ pageName = 'Page', layoutConfig = [], layerConfig = 
     const results = await Promise.all([
         newCreateFile({ layoutConfig, layerConfig }),
         ...modalArr.map(({ name, ...rest }) => {
-            return createFile(name, Object.assign(rest, { fileType: 'modal', type: 'ModalContainer' }), sourceCacheDir);
+            return createFile(name, Object.assign(rest, { pageName, fileType: 'modal', type: 'ModalContainer' }), sourceCacheDir);
         }),
         newCreateFile({ layerConfig, fileType: 'model', dir: 'models' }),
         newCreateFile({ layerConfig, fileType: 'service', dir: 'services' })
