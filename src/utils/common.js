@@ -45,12 +45,6 @@ function getRquestOptions(reqUrl, path, method = 'POST', acceptType = 'json', co
     return options;
 }
 
-function sendToClient(ctx, result) {
-    ctx.headers = result.headers;
-    ctx.status = result.statusCode;
-    ctx.body = result.body;
-}
-
 function getFetchApiOption(ctx) {
     const { host, appUrl, method = 'POST', api, params, access_token, MerchantId } = ctx.body;
     const appUrlObj = url.parse(appUrl);

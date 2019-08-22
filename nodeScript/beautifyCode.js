@@ -120,7 +120,7 @@ const beautify = (sourceCacheDir, fileName) => {
     return new Promise((resolve, reject) => {
         fs.ensureFile(copyFilePath).then(() => {
             fs.writeFileSync(copyFilePath, '');
-            rl = readline(sourceFilePath);
+            const rl = readline(sourceFilePath);
             rl.on('line', function(line) {
                 fs.appendFileSync(copyFilePath, getNewLine(line));
             }).on('close', () => {
