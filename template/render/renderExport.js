@@ -3,7 +3,7 @@ const renderExport = (extraConfig) => {
     if (form) {
         return `export default Form.create()(${pageName});`;
     }
-    return 'export default ${pageName};';
+    return `export default ${pageName};`;
 };
 
 module.exports = renderExport;

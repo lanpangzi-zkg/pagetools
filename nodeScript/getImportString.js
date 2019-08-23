@@ -37,6 +37,8 @@ const getAntdImportString = (layoutConfig = []) => {
         } else {
             if (Object.keys(item.configs || {}).length > 0 && Array.isArray(item.configs.cellsArr)) {
                 conbine(antdImportSets, getAntdImportString(item.configs.cellsArr));
+            } else {
+                antdImportSets.add(item.type);
             }
         }
     });

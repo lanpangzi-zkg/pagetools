@@ -46,9 +46,9 @@ const createCode = async ({ pageName = 'Page', layoutConfig = [], layerConfig = 
             break;
         }
     }
-    // if (responseObj.code == '0') { // 生成页面成功，压缩文件
-    //     compressing.gzip.compressFile(sourceCacheDir, `${sourceCacheDir}.gz`);
-    // }
+    if (responseObj.code == '0') { // 生成页面成功，压缩文件
+        compressing.tar.compressDir(sourceCacheDir, `${sourceCacheDir}.tar`);
+    }
     return responseObj;
 };
 
