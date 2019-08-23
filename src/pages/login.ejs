@@ -153,7 +153,6 @@
                     data: JSON.stringify({ UserName: $("#username").val(), Password: pass, RememberMe: remenber, authUrl: authUrl }),
                     dataType: "json",
                     success: function (data) {
-                        console.log('user/login2', data);
                         if (data.code == "0") {
                             $.ajax({
                                 type: "post",
