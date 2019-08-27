@@ -56,20 +56,20 @@ const renderWidget = (renderConfig, pageName) => {
     return component;
 };
 
-const renderInput = ({ configs }) => {
+const renderInput = (configs) => {
     return `<Input ${getProps(configs, 'Input')}/>`;
 };
 
-const renderTextArea = ({ configs }) => {
+const renderTextArea = (configs) => {
     const { colIndex, dropIndex, originSpan, cellStyles, hasLinkage,  ...rest } = configs;
     return `<TextArea ${getProps(configs, 'TextArea')} />`;
 };
 
-const renderText = ({ configs }) => {
+const renderText = (configs) => {
     const { text, style } = configs;
     return `<span style={${JSON.stringify(style)}}>${text}</span>`;
 };
-const renderBreadcrumb = ({ configs }) => {
+const renderBreadcrumb = (configs) => {
     const { breadcrumbArr = []} = configs;
     return `<Breadcrumb${getProps(configs)}>
         ${breadcrumbArr.map(({ label, value }, i) => {
@@ -81,7 +81,7 @@ const renderBreadcrumb = ({ configs }) => {
         }).join('')}
     </Breadcrumb>`;
 };
-const renderSelect = ({ configs }) => {
+const renderSelect = (configs) => {
     const { style = {}, selectArr = [] } = configs;
     const selectStyle = Object.assign({ width: '100%'}, style);
     return `<Select style={${JSON.stringify(selectStyle)}}>
@@ -95,7 +95,7 @@ const renderSelect = ({ configs }) => {
     </Select>`;
 };
 
-const renderTabs = ({ configs }) => {
+const renderTabs = (configs) => {
     const { style = {}, tabsArr = [] } = configs;
     return `<Tabs style={${JSON.stringify(style)}}>
         ${Array.isArray(tabsArr) ? tabsArr.map(({ key, label, value }) => {
@@ -107,7 +107,7 @@ const renderTabs = ({ configs }) => {
     </Tabs>`;
 };
 
-const renderRadio = ({ configs }) => {
+const renderRadio = (configs) => {
     const { style = {}, radioArr = [] } = configs;
     return `<Radio.Group style={${JSON.stringify(style)}>
         ${Array.isArray(radioArr) ? radioArr.map(({ key, label, value }) => {
@@ -119,18 +119,18 @@ const renderRadio = ({ configs }) => {
         }
     </Radio.Group>`;
 };
-const renderCheckbox = ({ configs }) => {
+const renderCheckbox = (configs) => {
     const { style = {}, checkboxArr = [] } = configs;
     const ckStyle = Object.assign({ width: '100%'}, style);
     const optionsStr = JSON.stringify(checkboxArr);
     return `<CheckboxGroup options={${optionsStr}} style={${JSON.stringify(ckStyle)} />`;
 };
-const renderDatePicker = ({ configs }) => {
+const renderDatePicker = (configs) => {
     const { showTime = false, format } = configs;
     return `<DatePicker style={{ width: '100%' }}  showTime={${showTime}} format="${format}" />`;
 };
 
-const renderRangePicker = ({ configs }) => {
+const renderRangePicker = (configs) => {
     const { showTime = false, format } = configs;
     return `<RangePicker style={{ width: '100%' }} showTime={${showTime}} format="${format}" />`;
 }

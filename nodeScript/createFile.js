@@ -3,14 +3,15 @@ const fs = require('fs-extra');
 const ejs = require('ejs');
 const beautify = require('./beautifyCode');
 const getImportString = require('./getImportString');
-const renderColumns = require('../template/render/renderColumns');
 const renderProp = require('../template/render/renderProp');
-const renderExport = require('../template/render/renderExport');
-const renderConstructor = require('../template/render/renderConstructor');
-const renderMethod = require('../template/render/renderMethod');
-const renderModel = require('../template/render/renderModel');
 const renderEnter = require('../template/render/renderEnter');
+const renderModel = require('../template/render/renderModel');
+const renderExport = require('../template/render/renderExport');
+const renderMethod = require('../template/render/renderMethod');
 const renderService = require('../template/render/renderService');
+const renderColumns = require('../template/render/renderColumns');
+const renderConstructor = require('../template/render/renderConstructor');
+const renderModalFormData = require('../template/render/renderModalFormData');
 
 const getEjsFile = (fileType) => {
     let ejsFile = '';
@@ -56,7 +57,7 @@ const createFile = async (pageName, fileConfig, sourceCacheDir) => {
     const sourceFile = path.resolve(sourceCacheDir, fileName);
     const templateFile =  path.resolve(sourceCacheDir, getEjsFile(fileType));
     fs.ensureFileSync(sourceFile);
-    const initImports = fileType === 'modal' ? ['Modal'] : [];
+    const initImports = fileType === 'modal' ? ['Modal', 'Spin'] : [];
     const [ importString, extraConfig ] = getImportString(layoutConfig, initImports);
     if (layerConfig && layerConfig.modalArr.length > 0) {
         extraConfig.modalArr = layerConfig.modalArr;
@@ -72,6 +73,7 @@ const createFile = async (pageName, fileConfig, sourceCacheDir) => {
         renderModel,
         renderExport,
         renderEnter,
+        renderModalFormData,
         renderService,
     };
     if (extraConfig.table) {

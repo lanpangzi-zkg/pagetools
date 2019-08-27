@@ -11,7 +11,9 @@ const renderModal = (configs = {}) => {
                 title="${title}"
                 width="${width}"
             >
-                ${renderEnter({ layoutConfig })}
+                <Spin spinning={this.state.loading}>
+                    ${renderEnter({ layoutConfig })}
+                </Spin>
             </Modal>
     `;
 };

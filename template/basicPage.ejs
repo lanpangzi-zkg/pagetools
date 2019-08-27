@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 <%- importString %>
 
 class <%= pageName %> extends Component {
@@ -6,7 +6,7 @@ class <%= pageName %> extends Component {
         super(props);
         <%- renderConstructor(extraConfig) %>
     }
-    <%- renderMethod(extraConfig) %>
+    <%- renderMethod(extraConfig, fileConfig, pageName) %>
     render() {<% -%>
         <%- renderProp(extraConfig) %>
         return (

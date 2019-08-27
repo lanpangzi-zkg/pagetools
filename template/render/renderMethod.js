@@ -1,13 +1,17 @@
-const getDispatchStr =(form, pageName) => {
+const getDispatchStr =(form, fileConfig, pageName) => {
     const getApiName = require('../function/getApiName');
-    const { formType, queryApi, addApi, editApi } = form;
-    if (formType === 'query' && queryApi) {
-        return `dispatch({
+    const { formType, queryApi = '', addApi, editApi } = form;
+    if (formType === 'query') {
+        const formConfigs = getFormConfigsByType(fileConfig);
+        return queryApi ? `${getSubmitValues(formConfigs)}
+        dispatch({
             type: '${pageName}/${getApiName(queryApi)}',
             payload: values,
-        });`;
+        });` : '// add code here';
     } else {
+        const formConfigs = getFormConfigsByType(fileConfig, 'save');
         return `
+            ${getSubmitValues(formConfigs)}
             const { mode = 'add' } = this.props;
             const disptachType = mode === 'add' ? '${pageName}/${getApiName(addApi)}' : '${pageName}/${getApiName(editApi)}';
             dispatch({
@@ -18,22 +22,62 @@ const getDispatchStr =(form, pageName) => {
     }
 };
 
+const getSubmitValues = (formConfigs) => {
+    const { formItemArr = [] } = formConfigs || {};
+    const dateKeys = [];
+    let dateStr = '';
+    formItemArr.forEach((item) => {
+        const { type } = item;
+        if (type === 'DatePicker' || type === 'RangePicker') {
+            dateKeys.push(item);
+        }
+    });
+    if (dateKeys.length > 0) {
+        dateStr = dateKeys.reduce((arr, { name, format }) => {
+            arr.push(`values.${name} = values.${name} && values.${name}.format('${format}');`);
+            return arr;
+        }, []).join('\n');
+    }
+    return dateStr;
+};
+
+const getFormConfigsByType = (fileConfig, pType ='query') => {
+    const { layoutConfig = [] } = fileConfig;
+    const formConfigs = layoutConfig.find(({ type, formType }) => {
+        return type === 'FormContainer' && formType === pType;
+    });
+    return formConfigs;
+};
+
+const renderOpItem = (itemConfigs) => {
+    const getApiName = require('../function/getApiName');
+    const { opText, opType, modalData, modalName, api } = itemConfigs;
+    let str = '';
+    if (opType === 'edit' || opType === 'view') {
+        str =  modalData === 'table' ? 'this.setState({ editData: record });' : `this.setState({ editData: record, init${modalName}Api: '${getApiName(api)}' });`;
+        return `<a onClick={() => {
+            ${str}
+            this.onShowModal('${modalName}');
+        }}>${opText}</a>`;
+    }
+    return `<span>${opText}</span>`;
+};
+
 const renderOperation = (operationArr) => {
     return `_columns[columns.length - 1].render = (text, record) => {
         return (
+            <Fragment>
             ${
-                operationArr.map(({ opText, opType, modalData, modalName }) => {
-                    return `<a onClick={() => {
-                        ${ opType === 'edit' && modalData === 'table' ? 'this.setState({ editData: record });' : '' }
-                        this.showModal('${modalName}');
-                    }}>${opText}</a>`;
-                }).join('Divider type="vertical" />')
+                operationArr.map((itemConfigs) => {
+                    return renderOpItem(itemConfigs);
+                }).join('\n<Divider type="vertical" />\n')
             }
+        </Fragment>
         );
     };`;
 };
 
-const renderMethod = (extraConfig, pName) => {
+const renderMethod = (extraConfig, fileConfig, pName) => {
     const {
         form,
         table,
@@ -44,11 +88,11 @@ const renderMethod = (extraConfig, pName) => {
     if (form) {
         methodStrArr.push(`
             onSubmit(e) {
-                e.preventDefault();
+                e && e.preventDefault();
                 const { form, dispatch } = this.props;
                 form.validateFields((err, values) => {
                     if (!err) {
-                       ${getDispatchStr(form, pName || pageName)}
+                       ${getDispatchStr(form, fileConfig, pName || pageName)}
                     }
                 });
             }
@@ -56,21 +100,16 @@ const renderMethod = (extraConfig, pName) => {
     }
     if (modalArr) {
         methodStrArr.push(`
-            onSubmitModal = (modalName, modelType, payload) => {
-                this.props.dispatch({
-                    type: \`${pageName}/\${modelType\}\`,
-                    payload,
-                }).then((result) => {
-                    if (result && result.data && result.data.code == '0') {
-                        this.onToggleModal(modalName);
-                    }
+            onHiddenModal = (modalName) => {
+                this.setState({
+                    [\`show\${modalName\}\`]: false,
                 });
             }
         `);
         methodStrArr.push(`
-            onToggleModal = (modalName) => {
+            onShowModal = (modalName) => {
                 this.setState({
-                    [\`show\${modalName\}\`]: false,
+                    [\`show\${modalName\}\`]: true,
                 });
             }
         `);
@@ -97,7 +136,7 @@ const renderMethod = (extraConfig, pName) => {
         }
         onShowSizeChange = (current, size) => {
             this.setState({
-                ageIndex: current,
+                PageIndex: current,
                 PageSize: size,
             });
         }`);

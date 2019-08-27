@@ -1,5 +1,5 @@
 const getTableProps = (configs) => {
-    const { modelKey, pagination, rowKey = '', rowSelection } = configs;
+    const { modelKey = '[]', pagination, rowKey = '', rowSelection } = configs;
     const propsArr = [`dataSource={${modelKey}}`];
     if (pagination) {
         propsArr.push(`pagination={{

@@ -12,15 +12,16 @@ const renderProp = (extraConfig) => {
         `);
     }
     if (table) {
-        const { modelKey, pagination } = table;
-        strArr.push(`
-            const { form } = this.props.${pageName};
-        `);
+        const { modelKey = '', pagination } = table;
         if (pagination) {
             strArr.push(`
                 const { PageIndex, PageSize } = this.state;
-                const { ${modelKey}Total, ${modelKey}List } = this.props.${pageName};
+                const { ${modelKey}Total, ${modelKey} } = this.props.${pageName};
             `);
+        } else {
+            strArr.push(`
+            const { ${modelKey} } = this.props.${pageName};
+        `);
         }
     }
     return strArr.join('\n');

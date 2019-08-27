@@ -22,22 +22,23 @@ const getAntdImportString = (layoutConfig = []) => {
     layoutConfig.forEach((item) => {
         if (item.type === 'FormContainer') {
             antdImportSets.add('Form');
-            extraConfig.form = item.configs;
+            extraConfig.form = item;
             const { formItemArr = [] } = item;
             formItemArr.forEach((formItem) => {
                 formItem.type && antdImportSets.add(formItem.type);
             });
         } else if (item.type === 'TableContainer') {
-            if (item.configs.pagination) {
-                extraConfig.table = item.configs;
+            extraConfig.table = item;
+            if (item && item.hasOperation && item.operationArr.length > 1) {
+                antdImportSets.add('Divider');
             }
             antdImportSets.add('Table');
         } else if (item.type === 'LineContainer') {
             antdImportSets.add('Divider');
         } else {
-            if (Object.keys(item.configs || {}).length > 0 && Array.isArray(item.configs.cellsArr)) {
-                conbine(antdImportSets, getAntdImportString(item.configs.cellsArr));
-            } else {
+            if (Object.keys(item || {}).length > 0 && Array.isArray(item.cellsArr)) {
+                conbine(antdImportSets, getAntdImportString(item.cellsArr));
+            } else if (item.type) {
                 antdImportSets.add(item.type);
             }
         }
