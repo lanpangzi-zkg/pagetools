@@ -3,7 +3,7 @@ const { getProps } = require('../function/propsUtil');
 
 const renderBoxCell = (config, layoutColumn) => {
     const renderWidget = require('./renderWidget');
-    return `<div className="cell-${layoutColumn}">
+    return `<div className="cell cell-${layoutColumn}">
                 ${renderWidget(config)}
             </div>
     `;

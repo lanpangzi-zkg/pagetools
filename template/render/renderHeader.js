@@ -2,7 +2,7 @@
 
 const renderHeaderCell = (config, cellNum = 1) => {
     const renderWidget = require('./renderWidget');
-    return `<div className="cell-${cellNum}">
+    return `<div className="cell cell-${cellNum}">
         ${renderWidget(config)}
     </div>`;
 };

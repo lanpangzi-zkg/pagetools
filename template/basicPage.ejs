@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react';
+import { connect } from 'dva';
 <%- importString %>
 
+@connect(state => state)
 class <%= pageName %> extends Component {
     constructor(props) {
         super(props);

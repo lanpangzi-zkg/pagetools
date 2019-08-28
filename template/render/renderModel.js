@@ -20,7 +20,7 @@ const renderEffect = (requestApi, modelKey, requestPagination) => {
             if(result.code != CODE_SUCCESS) {
                 result && message.error(result.message);
                 yield put({
-                    type: REDUCER_TYPE,
+                    type: 'updateState',
                     payload: {
                         ${apiName}Loading: false,
                     },

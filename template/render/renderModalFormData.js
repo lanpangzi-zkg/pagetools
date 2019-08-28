@@ -4,12 +4,12 @@ const renderModalFormData = (fileConfig) => {
             const { loading } = this.state;
             const { mode, visible, initApi, editData, dispatch } = this.props;
             // 编辑模式，初始化表单
-            if (visible && mode === 'edit' && !this.initEdit && recordData && !loading) {
+            if (visible && mode === 'edit' && !this.initEdit && editData && !loading) {
                 // 调用接口初始化表单
                 if (initApi) {
                     dispatch({
                         type: \`${fileConfig.pageName}/\${initApi}\`,
-                        payload: recordData
+                        payload: editData
                     }).then((result) => {
                         const { code, data } = result;
                         if (code === '0') {
@@ -22,7 +22,7 @@ const renderModalFormData = (fileConfig) => {
                 }
             }
         }
-        onInitForm(formData) {
+        onInitForm() {
             const { editData, form } = this.props;
             ${onInitForm(layoutConfig)}
         }

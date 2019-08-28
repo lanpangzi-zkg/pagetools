@@ -3,8 +3,8 @@ const getTableProps = (configs) => {
     const propsArr = [`dataSource={${modelKey}}`];
     if (pagination) {
         propsArr.push(`pagination={{
-            showQuickJumper,
-            showSizeChanger,
+            showQuickJumper: true,
+            showSizeChanger: true,
             total: ${modelKey}Total,
             current: PageIndex,
             pageSize: PageSize,

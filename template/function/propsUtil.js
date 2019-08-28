@@ -24,13 +24,16 @@ const getCompStyle = (config) => {
 };
 
 const getBtnProps = (btnConfig) => {
-    const { btnIndex, htmlType, antdType, logicType } = btnConfig;
-    const propsArr = [`key="btn-${btnIndex}"`];
+    const { htmlType, antdType, logicType, modalName } = btnConfig;
+    const propsArr = [];
     if (htmlType) {
         propsArr.push(`htmlType="${htmlType}"`);
     }
     if (antdType) {
         propsArr.push(`type="${antdType}"`);
+    }
+    if (modalName) {
+        propsArr.push(`onClick={() => {() => this.onShowModal('${modalName}');}}`);
     }
     if (propsArr.length > 0) {
         return ` ${propsArr.join(' ')}`;

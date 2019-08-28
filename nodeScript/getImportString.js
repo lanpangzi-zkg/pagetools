@@ -1,12 +1,18 @@
 let extraConfig = {};
 
-const getImportString = (layoutConfig = [], initImports = []) => {
+const getImportString = (layoutConfig = [], layerConfig = [], initImports = []) => {
     extraConfig = {};
     const results = new Array(2);
     const antdImportSets = conbine(getAntdImportString(layoutConfig), new Set(initImports));
     results[1] = Object.assign({}, extraConfig);
     const otherImportSets = getOtherImportString(antdImportSets);
-    results[0] = (antdImportSets.size > 0 ? "import { " + Array.from(antdImportSets).join(', ') + " } " + `from 'antd';\n${otherImportSets.join('\n')}` : '');
+    const { modalArr = [] } = layerConfig;
+    const modalImports = modalArr.reduce((arr, { name }) => {
+        arr.push(`import ${name} from './${name}';`);
+        return arr;
+    }, []).join('\n');
+    results[0] = (antdImportSets.size > 0 ? "import { " + Array.from(antdImportSets).join(', ') + " } " 
+        + `from 'antd';\n${modalImports}\n${otherImportSets.join('\n')}` : '');
     return results;
 };
 
@@ -22,6 +28,8 @@ const getAntdImportString = (layoutConfig = []) => {
     layoutConfig.forEach((item) => {
         if (item.type === 'FormContainer') {
             antdImportSets.add('Form');
+            antdImportSets.add('Row');
+            antdImportSets.add('Col');
             extraConfig.form = item;
             const { formItemArr = [] } = item;
             formItemArr.forEach((formItem) => {

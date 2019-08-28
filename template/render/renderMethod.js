@@ -3,7 +3,7 @@ const getDispatchStr =(form, fileConfig, pageName) => {
     const { formType, queryApi = '', addApi, editApi } = form;
     if (formType === 'query') {
         const formConfigs = getFormConfigsByType(fileConfig);
-        return queryApi ? `${getSubmitValues(formConfigs)}
+        return queryApi ? `${getSubmitValues(formConfigs, fileConfig)}
         dispatch({
             type: '${pageName}/${getApiName(queryApi)}',
             payload: values,
@@ -11,9 +11,9 @@ const getDispatchStr =(form, fileConfig, pageName) => {
     } else {
         const formConfigs = getFormConfigsByType(fileConfig, 'save');
         return `
-            ${getSubmitValues(formConfigs)}
             const { mode = 'add' } = this.props;
             const disptachType = mode === 'add' ? '${pageName}/${getApiName(addApi)}' : '${pageName}/${getApiName(editApi)}';
+            ${getSubmitValues(formConfigs, fileConfig)}
             dispatch({
             type: disptachType,
             payload: values,
@@ -22,8 +22,8 @@ const getDispatchStr =(form, fileConfig, pageName) => {
     }
 };
 
-const getSubmitValues = (formConfigs) => {
-    const { formItemArr = [] } = formConfigs || {};
+const getSubmitValues = (formConfigs, fileConfig = {}) => {
+    const { formItemArr = [], editApi } = formConfigs || {};
     const dateKeys = [];
     let dateStr = '';
     formItemArr.forEach((item) => {
@@ -38,7 +38,23 @@ const getSubmitValues = (formConfigs) => {
             return arr;
         }, []).join('\n');
     }
-    return dateStr;
+    let editParams = '';
+    if (editApi) {
+        const { layerConfig = {} } = fileConfig;
+        const { apiArr = [] } = layerConfig;
+        console.log(fileConfig);
+        const apiObj = apiArr.find(({ requestApi }) => {
+            return editApi === requestApi;
+        });
+        if (apiObj) {
+            const { requestParams } = apiObj;
+            editParams = requestParams.split(',').reduce((arr, pid) => {
+                arr.push(`values.${pid} = editData.${pid};`);
+                return arr;
+            }, ["if (mode === 'edit') {\n"]).join('\n') + '\n}';
+        }
+    }
+    return dateStr + '\n' + editParams;
 };
 
 const getFormConfigsByType = (fileConfig, pType ='query') => {
@@ -54,7 +70,8 @@ const renderOpItem = (itemConfigs) => {
     const { opText, opType, modalData, modalName, api } = itemConfigs;
     let str = '';
     if (opType === 'edit' || opType === 'view') {
-        str =  modalData === 'table' ? 'this.setState({ editData: record });' : `this.setState({ editData: record, init${modalName}Api: '${getApiName(api)}' });`;
+        str =  modalData === 'table' ? `this.setState({ editData: record, ${modalName}Mode: '${opType}' });` :
+            `this.setState({ editData: record, init${modalName}Api: '${getApiName(api)}', ${modalName}Mode: '${opType}' });`;
         return `<a onClick={() => {
             ${str}
             this.onShowModal('${modalName}');

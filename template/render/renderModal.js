@@ -5,11 +5,12 @@ const renderModal = (configs = {}) => {
                 closable={false}
                 maskClosable={false}
                 centered
+                visible={this.props.visible}
                 onCancel={this.onCancel}
                 onOk={this.onOk}
                 afterClose={this.onResetModal}
                 title="${title}"
-                width="${width}"
+                width="${parseInt(width || 1024)}"
             >
                 <Spin spinning={this.state.loading}>
                     ${renderEnter({ layoutConfig })}

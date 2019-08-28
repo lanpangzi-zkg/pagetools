@@ -13,8 +13,7 @@ const renderService = ({ layerConfig }) => {
             };`;
         } else {
             return `export const ${getApiName(requestApi)} = (params) => {
-                const { data } = params;
-                return axios.post(${concatReqUrl(requestHost, requestApi)}, data);
+                return axios.post(${concatReqUrl(requestHost, requestApi)}, params);
             };`;
         }
     }).join('\n');

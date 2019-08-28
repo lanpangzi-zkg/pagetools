@@ -13,8 +13,8 @@ class <%= pageName %> extends Component {
     <%- renderModalFormData(fileConfig) %>
     <%- renderMethod(extraConfig, fileConfig, fileConfig.pageName) %>
     onCancel() {
-        const { onToggleModal } = this.props;
-        onToggleModal();
+        const { onCancel } = this.props;
+        onCancel('<%= pageName %>');
         this.onResetModal();
     }
     onOk() {
@@ -27,7 +27,7 @@ class <%= pageName %> extends Component {
     render() {<% -%>
         <%- renderProp(extraConfig) %>
         return (
-            <div className="fulu-container">
+            <div className="fulu-modal-container">
                 <%- renderEnter(fileConfig) %>
             </div>
         );

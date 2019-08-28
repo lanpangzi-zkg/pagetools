@@ -58,7 +58,7 @@ const createFile = async (pageName, fileConfig, sourceCacheDir) => {
     const templateFile =  path.resolve(sourceCacheDir, getEjsFile(fileType));
     fs.ensureFileSync(sourceFile);
     const initImports = fileType === 'modal' ? ['Modal', 'Spin'] : [];
-    const [ importString, extraConfig ] = getImportString(layoutConfig, initImports);
+    const [ importString, extraConfig ] = getImportString(layoutConfig, layerConfig, initImports);
     if (layerConfig && layerConfig.modalArr.length > 0) {
         extraConfig.modalArr = layerConfig.modalArr;
     }
