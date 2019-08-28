@@ -13,19 +13,23 @@ const isStartTag = (line) => {
 };
 
 const isEndTag = (line) => {
-	return matchWithLine(line, /<\/.+>$|}[;,]?$|\);?$|}?\);?|\/>/);
+	return matchWithLine(line, /<\/.+>$|}[;,]?$|\);?$|}?\);?$|\/>/);
 };
 
 /**
- * @desc 匹配'})('和>，需要lineSpace先减一再加一
+ * @desc 匹配'})(', '} {'和'>'，需要lineSpace先减一再加一 
  * @param {*} line 
  */
 const isEspecialTag = (line) => {
-	return line === '})(' || line === '>' || matchWithLine(line, /^\}\).+\{$/);
+	return line === '})(' || line === '>' || matchWithLine(line, /^\}\)?.+\{$/);
 };
 
+/**
+ * @desc 匹配 ...{...} (...);
+ * @param {*} line 
+ */
 const isWholeBracket = (line) => {
-	return matchWithLine(line, /\(.{0,}?\);?$|^\{.+\}$|\{.{0,}?\}/);
+	return line.indexOf('})') !== 0 && line.indexOf('}') !== 0 && matchWithLine(line, /\(.{0,}?\);?$|^\{.+\}$|\{.{0,}?\}/);
 };
 
 /**
@@ -75,6 +79,9 @@ const getNewLine = (line) => {
 	if (!_line) { // 空行
 		return '';
 	}
+	if (_line.indexOf('export default') === 0 && _line.indexOf('export default {') !== 0) {
+		return addWhiteSpace(_line, 0);
+	}
 	const wholeTag = isWholeTagInline(_line);
 	if (wholeTag) { // 包含起始标签
 		return addWhiteSpace(_line, curLineSpace);
@@ -87,21 +94,29 @@ const getNewLine = (line) => {
 	if (especialTag) {
 		return addWhiteSpace(_line, curLineSpace - 1);
 	}
+
 	const startTag = isStartTag(_line);
 	if (startTag) { // 只包含开始标签
 		tagStack.push(curLineSpace);
 		curLineSpace++;
 		return addWhiteSpace(_line, curLineSpace - 1);
 	}
+	
 	const wholeBracket = isWholeBracket(_line);
 	if (wholeBracket) { // 包含起始圆括号
 		return addWhiteSpace(_line, curLineSpace);
+	}
+	if (_line === 'gamePageList: result.data &&  Array.isArray(result.data.list) ? result.data.list: [],') {
+		console.log(1);
 	}
 	const endTag = isEndTag(_line);
 	if (endTag) { // 只包含结束标签
 		const lineSpace = tagStack.pop() || 0;
 		curLineSpace = lineSpace;
 		return addWhiteSpace(_line, curLineSpace);
+	}
+	if (_line === 'gamePageList: result.data &&  Array.isArray(result.data.list) ? result.data.list: [],') {
+		console.log(2);
 	}
 	const tagWithWrap = isTagWithWrap(_line);
 	if (tagWithWrap) { // 开始标签折行
@@ -116,7 +131,7 @@ const beautify = (sourceCacheDir, fileName) => {
 	reset();
 	const copyFileName = `${fileName.slice(0, fileName.lastIndexOf('.'))}Copy.js`;
     const copyFilePath = path.resolve(sourceCacheDir, copyFileName);
-    const sourceFilePath = path.resolve(sourceCacheDir, fileName);
+	const sourceFilePath = path.resolve(sourceCacheDir, fileName);
     return new Promise((resolve, reject) => {
         fs.ensureFile(copyFilePath).then(() => {
             fs.writeFileSync(copyFilePath, '');
@@ -131,6 +146,8 @@ const beautify = (sourceCacheDir, fileName) => {
                     info: '生成页面成功',
 				});
 			}).on('error', function(e) {
+				fs.unlinkSync(sourceFilePath);
+				fs.unlinkSync(copyFilePath);
 				console.log('error', e);
                 reject(e);
             });

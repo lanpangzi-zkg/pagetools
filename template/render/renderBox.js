@@ -11,7 +11,7 @@ const renderBoxCell = (config, layoutColumn) => {
 
 const renderBox = (configs) => {
     const { layoutColumn = 1 } = configs;
-    return `<div class="fulu-box"${getProps(configs)}>
+    return `<div className="fulu-box"${getProps(configs)}>
                 ${Array.isArray(configs.cellsArr) ? configs.cellsArr.map((config) => renderBoxCell(config, layoutColumn)).join('') : ''} 
             </div>`;
 };

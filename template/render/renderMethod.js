@@ -4,20 +4,31 @@ const getDispatchStr =(form, fileConfig, pageName) => {
     if (formType === 'query') {
         const formConfigs = getFormConfigsByType(fileConfig);
         return queryApi ? `${getSubmitValues(formConfigs, fileConfig)}
+        this.onToggleLoading();
         dispatch({
             type: '${pageName}/${getApiName(queryApi)}',
             payload: values,
-        });` : '// add code here';
+        }).then(() => {
+            this.onToggleLoading();
+        }).catch(this.onError);` : '// add code here';
     } else {
         const formConfigs = getFormConfigsByType(fileConfig, 'save');
         return `
             const { mode = 'add' } = this.props;
             const disptachType = mode === 'add' ? '${pageName}/${getApiName(addApi)}' : '${pageName}/${getApiName(editApi)}';
             ${getSubmitValues(formConfigs, fileConfig)}
+            this.onToggleLoading();
             dispatch({
             type: disptachType,
             payload: values,
-        });
+        }).then((res) => {
+            this.onToggleLoading();
+            const { code } = res;
+            if (code === '0') {
+                message.success('保存成功');
+                ${fileConfig.fileType === 'modal' ? 'this.onCancel(true);' : ''}
+            }
+        }).catch(this.onError);
         `;
     }
 };
@@ -42,7 +53,6 @@ const getSubmitValues = (formConfigs, fileConfig = {}) => {
     if (editApi) {
         const { layerConfig = {} } = fileConfig;
         const { apiArr = [] } = layerConfig;
-        console.log(fileConfig);
         const apiObj = apiArr.find(({ requestApi }) => {
             return editApi === requestApi;
         });
@@ -77,7 +87,7 @@ const renderOpItem = (itemConfigs) => {
             this.onShowModal('${modalName}');
         }}>${opText}</a>`;
     }
-    return `<span>${opText}</span>`;
+    return `<a href="javascript:void(0);">${opText}</a>`;
 };
 
 const renderOperation = (operationArr) => {
@@ -101,12 +111,21 @@ const renderMethod = (extraConfig, fileConfig, pName) => {
         pageName,
         modalArr,
     } =  extraConfig;
-    const methodStrArr= [];
+    const methodStrArr= [
+        `onError(e) {
+            this.onToggleLoading();
+        }
+        onToggleLoading() {
+            this.setState({
+                loading: !this.state.loading,
+            });
+        }`
+    ];
     if (form) {
         methodStrArr.push(`
             onSubmit(e) {
                 e && e.preventDefault();
-                const { form, dispatch } = this.props;
+                ${ fileConfig.fileType === 'modal' ? 'const { form, dispatch, editData } = this.props;' : 'const { form, dispatch } = this.props;' }
                 form.validateFields((err, values) => {
                     if (!err) {
                        ${getDispatchStr(form, fileConfig, pName || pageName)}
@@ -117,10 +136,13 @@ const renderMethod = (extraConfig, fileConfig, pName) => {
     }
     if (modalArr) {
         methodStrArr.push(`
-            onHiddenModal = (modalName) => {
+            onHiddenModal = (modalName, updateList) => {
                 this.setState({
                     [\`show\${modalName\}\`]: false,
                 });
+                if (updateList && typeof this.onSubmit === 'function') {
+                    this.onSubmit();
+                }
             }
         `);
         methodStrArr.push(`
@@ -156,7 +178,8 @@ const renderMethod = (extraConfig, fileConfig, pName) => {
                 PageIndex: current,
                 PageSize: size,
             });
-        }`);
+        }
+        `);
     }
     return methodStrArr.join('\n');
 };

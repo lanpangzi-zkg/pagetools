@@ -19,23 +19,15 @@ const renderEffect = (requestApi, modelKey, requestPagination) => {
             const result = yield call(service.${apiName}, action.payload || {});
             if(result.code != CODE_SUCCESS) {
                 result && message.error(result.message);
-                yield put({
-                    type: 'updateState',
-                    payload: {
-                        ${apiName}Loading: false,
-                    },
-                });
-                return;
-            }
-            if (result && result.data) {
+            } else {
                 yield put({
                     type: 'updateState',
                     payload: {
                         ${getPaylodStr(modelKey, requestPagination)}
-                        ${apiName}Loading: false,
                     },
                 });
             }
+            return result;
         },
     `;
 };

@@ -6,10 +6,10 @@ const renderConstructor = (extraConfig, isModal) => {
     const strArr = [];
     const stateArr = ['this.state = {'];
     if (form) {
-        strArr.push(`this.onSubmit = this.onSubmit.bind(this);`);
-        if (isModal) {
-            stateArr.push('loading: false,');
-        }
+        strArr.push('this.onSubmit = this.onSubmit.bind(this);');
+        strArr.push('this.onError = this.onError.bind(this);');
+        strArr.push('this.onToggleLoading = this.onToggleLoading.bind(this);');
+        stateArr.push('loading: false,');
     }
     if (table && table.pagination) {
         stateArr.push(`

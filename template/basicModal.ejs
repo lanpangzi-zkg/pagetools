@@ -12,9 +12,13 @@ class <%= pageName %> extends Component {
     }
     <%- renderModalFormData(fileConfig) %>
     <%- renderMethod(extraConfig, fileConfig, fileConfig.pageName) %>
-    onCancel() {
+    onCancel(updateList = false) {
+        const { loading } = this.state;
+        if (loading) {
+            return;
+        }
         const { onCancel } = this.props;
-        onCancel('<%= pageName %>');
+        onCancel('<%= pageName %>', updateList);
         this.onResetModal();
     }
     onOk() {

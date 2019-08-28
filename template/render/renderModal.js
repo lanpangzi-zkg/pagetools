@@ -2,7 +2,6 @@ const renderModal = (configs = {}) => {
     const { layoutConfig = [], title, width } = configs;
     const renderEnter = require('./renderEnter');
     return `<Modal
-                closable={false}
                 maskClosable={false}
                 centered
                 visible={this.props.visible}
@@ -10,7 +9,7 @@ const renderModal = (configs = {}) => {
                 onOk={this.onOk}
                 afterClose={this.onResetModal}
                 title="${title}"
-                width="${parseInt(width || 1024)}"
+                width={${parseInt(width || 1024)}}
             >
                 <Spin spinning={this.state.loading}>
                     ${renderEnter({ layoutConfig })}

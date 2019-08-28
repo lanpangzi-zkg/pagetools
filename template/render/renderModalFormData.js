@@ -7,15 +7,17 @@ const renderModalFormData = (fileConfig) => {
             if (visible && mode === 'edit' && !this.initEdit && editData && !loading) {
                 // 调用接口初始化表单
                 if (initApi) {
+                    this.onToggleLoading();
                     dispatch({
                         type: \`${fileConfig.pageName}/\${initApi}\`,
                         payload: editData
                     }).then((result) => {
+                        this.onToggleLoading();
                         const { code, data } = result;
                         if (code === '0') {
                             this.onInitForm(data);
                         }
-                    });
+                    }).catch(this.onError);
                 }
                 else {
                     this.onInitForm(editData);

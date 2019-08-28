@@ -7,7 +7,7 @@ const getImportString = (layoutConfig = [], layerConfig = [], initImports = []) 
     results[1] = Object.assign({}, extraConfig);
     const otherImportSets = getOtherImportString(antdImportSets);
     const { modalArr = [] } = layerConfig;
-    const modalImports = modalArr.reduce((arr, { name }) => {
+    const modalImports = initImports.indexOf('Modal') >= 0 ? '' : modalArr.reduce((arr, { name }) => {
         arr.push(`import ${name} from './${name}';`);
         return arr;
     }, []).join('\n');
@@ -59,6 +59,10 @@ const getOtherImportString = (antdImportSets) => {
     if (antdImportSets.has('RangePicker') || antdImportSets.has('DatePicker')) {
         antherImports.push("import moment from 'monent';");
         antdImportSets.delete('RangePicker');
+    }
+    if (antdImportSets.has('Table')) {
+        antherImports.push("import { Table } from 'fl-pro';");
+        antdImportSets.delete('Table');
     }
     if (antdImportSets.has('RangePicker')) {
         antherImports.push('const { RangePicker } = DatePicker;');

@@ -13,7 +13,9 @@ class <%= pageName %> extends Component {
         <%- renderProp(extraConfig) %>
         return (
             <div className="fulu-container">
-                <%- renderEnter(fileConfig, pageName, true) %>
+                <Spin spinning={this.state.loading}>
+                    <%- renderEnter(fileConfig, pageName, true) %>
+                </Spin>
             </div>
         );
     }
