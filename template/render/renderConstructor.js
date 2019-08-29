@@ -3,7 +3,7 @@ const renderConstructor = (extraConfig, isModal) => {
         form,
         table,
     } =  extraConfig;
-    const strArr = [];
+    const strArr = ['this.execFetchApi = this.execFetchApi.bind(this);'];
     const stateArr = ['this.state = {'];
     if (form) {
         strArr.push('this.onSubmit = this.onSubmit.bind(this);');
@@ -11,11 +11,19 @@ const renderConstructor = (extraConfig, isModal) => {
         strArr.push('this.onToggleLoading = this.onToggleLoading.bind(this);');
         stateArr.push('loading: false,');
     }
-    if (table && table.pagination) {
-        stateArr.push(`
-            PageIndex: 1,
-            PageSize: 10,
-        `);
+    if (table) {
+        if (table.pagination) {
+            stateArr.push(`
+                PageIndex: 1,
+                PageSize: 10,
+            `);
+        }
+        if (table.rowSelection) {
+            stateArr.push(`
+                selectedRowKeys: [],
+                selectedRows: [],
+            `);
+        }
     }
     stateArr.push('};');
     if (table) {

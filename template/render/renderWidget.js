@@ -2,7 +2,7 @@ const { getProps } = require('../function/propsUtil');
 const renderButton = require('./renderButton');
 const renderContainer = require('./renderContainer');
 
-const renderWidget = (renderConfig, pageName) => {
+const renderWidget = (renderConfig, pageName, layerConfig) => {
     const { type } = renderConfig;
     let component = '';
     if (!Object.hasOwnProperty.call(renderConfig, 'type')) {
@@ -40,7 +40,7 @@ const renderWidget = (renderConfig, pageName) => {
             component = renderTextArea(renderConfig);
             break;
         case 'Button':
-            component = renderButton(renderConfig);
+            component = renderButton(renderConfig, layerConfig);
             break;
         case 'FormContainer':
         case 'ModalContainer':
@@ -48,7 +48,7 @@ const renderWidget = (renderConfig, pageName) => {
         case 'TableContainer':
         case 'BoxContainer':
         case 'HeaderContainer':
-            component = renderContainer(renderConfig, pageName);
+            component = renderContainer(renderConfig, pageName, layerConfig);
             break;
         default:
             break;

@@ -119,7 +119,18 @@ const renderMethod = (extraConfig, fileConfig, pName) => {
             this.setState({
                 loading: !this.state.loading,
             });
-        }`
+        }
+        execFetchApi(api, params) {
+            const { dispatch } = this.props;
+            this.onToggleLoading();
+            dispatch({
+                type: \`${pName || pageName}/\${api}\`,
+                payload: params,
+            }).then(() => {
+                this.onToggleLoading();
+            }).catch(this.onError);
+        }
+        `
     ];
     if (form) {
         methodStrArr.push(`

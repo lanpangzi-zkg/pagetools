@@ -1,8 +1,8 @@
 const getInitialValue = require('./getInitialValue');
 
-const getProps = (config, type) => {
+const getProps = (config, type, layerConfig) => {
     if (type === 'Button') {
-        return getBtnProps(config);
+        return getBtnProps(config, layerConfig);
     }
     if (type === 'Input') {
         return getInputProps(config);
@@ -23,8 +23,8 @@ const getCompStyle = (config) => {
     return '';
 };
 
-const getBtnProps = (btnConfig) => {
-    const { htmlType, antdType, logicType, modalName } = btnConfig;
+const getBtnProps = (btnConfig, layerConfig) => {
+    const { htmlType, antdType, logicType, modalName, skipUrl, api = '' } = btnConfig;
     const propsArr = [];
     if (htmlType) {
         propsArr.push(`htmlType="${htmlType}"`);
@@ -34,9 +34,42 @@ const getBtnProps = (btnConfig) => {
     }
     if (modalName) {
         propsArr.push(`onClick={() => {() => this.onShowModal('${modalName}');}}`);
+    } else if (logicType === 'mult') {
+        const getApiName = require('../function/getApiName');
+        propsArr.push('disabled={this.state.selectedRowKeys.length === 0}');
+        let concatStr = `
+            const { selectedRowKeys } = this.state;
+            this.execFetchApi('${getApiName(api)}', selectedRowKeys);
+        `;
+        if (layerConfig) {
+            const { apiArr } = layerConfig;
+            const apiObj = apiArr.find(({ requestApi }) => {
+                return requestApi === api;
+            });
+            if (apiObj && apiObj.requestParams) {
+                const paramKeyArr = apiObj.requestParams.split(',');
+                concatStr = `
+                    const { selectedRows } = this.state;
+                    const params = selectedRows.reduce((arr, item) => {
+                        const _temp = {};
+                        ${JSON.stringify(paramKeyArr)}.forEach((pk) => {
+                            _temp[pk] = item[pk];
+                        });
+                        arr.push(_temp);
+                        return arr;
+                    }, []);
+                    this.execFetchApi('${getApiName(api)}', params);
+                `;
+            }
+        }
+        propsArr.push(`onClick={() => {
+            ${concatStr}
+        }}`);
+    } else if (logicType === 'skip') {
+        propsArr.push(`onClick={() => this.props.history.push('${skipUrl}')}`);
     }
     if (propsArr.length > 0) {
-        return ` ${propsArr.join(' ')}`;
+        return ` ${propsArr.join('\n')}`;
     }
     return '';
 };

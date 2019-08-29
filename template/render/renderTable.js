@@ -16,7 +16,16 @@ const getTableProps = (configs) => {
         propsArr.push(`rowKey="${rowKey}"`);
     }
     if (rowSelection) {
-        propsArr.push(`rowSelection={${JSON.stringify(rowSelection)}}`);
+        propsArr.push(`rowSelection={{
+            type: ${rowSelection.type},
+            selectedRowKeys: this.state.selectedRowKeys,
+            onChnage: (selectedRowKeys, selectedRows) => {
+                this.setState({
+                    selectedRowKeys,
+                    selectedRows,
+                });
+            }
+        }}`);
     }
     return propsArr.join('\n');
 };

@@ -13,7 +13,10 @@ class aaaa extends Component {
 			loading: false,
 			PageIndex: 1,
 			PageSize: 10,
+			selectedRowKeys: [],
+			selectedRows: [],
 		};
+		this.execFetchApi = this.execFetchApi.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
 		this.onError = this.onError.bind(this);
 		this.onToggleLoading = this.onToggleLoading.bind(this);
@@ -26,6 +29,16 @@ class aaaa extends Component {
 		this.setState({
 			loading: !this.state.loading,
 		});
+	}
+	execFetchApi(api, params) {
+		const { dispatch } = this.props;
+		this.onToggleLoading();
+		dispatch({
+			type: `aaaa/${api}`,
+			payload: params,
+		}).then(() => {
+			this.onToggleLoading();
+		}).catch(this.onError);
 	}
 	onSubmit(e) {
 		e && e.preventDefault();
@@ -63,9 +76,9 @@ class aaaa extends Component {
 					<a onClick={() => {
 						this.setState({ editData: record, AddModalMode: 'edit' });
 						this.onShowModal('AddModal');
-					}}>编辑</a>
+					}}>edit</a>
 					<Divider type="vertical" />
-					<span>游戏区列表</span>
+					<a href="javascript:void(0);">skip</a>
 				</Fragment>
 			);
 		};
@@ -95,10 +108,10 @@ class aaaa extends Component {
 						<div className="cell cell-1">
 							<Breadcrumb>
 								<Breadcrumb.Item key="breadcrumb-0">
-									<span>游戏管理</span>
+									<span>menu1</span>
 								</Breadcrumb.Item>
 								<Breadcrumb.Item key="breadcrumb-1">
-									<span>游戏列表</span>
+									<span>menu2</span>
 								</Breadcrumb.Item>
 							</Breadcrumb>
 						</div>
@@ -108,16 +121,16 @@ class aaaa extends Component {
 							<Form onSubmit={this.onSubmit} layout="inline">
 								<Row gutter={{ md: 8, lg: 24, xl: 48 }}>
 									<Col md={8} sm={24}>
-										<FormItem label="店铺游戏ID">
-											{getFieldDecorator("GameId")(
-												<Input placeholder="店铺游戏ID"/>
+										<FormItem label="Input">
+											{getFieldDecorator("name-0")(
+												<Input />
 											)}
 										</FormItem>
 									</Col>
 									<Col md={8} sm={24}>
-										<FormItem label="店铺游戏名称">
-											{getFieldDecorator("GameName")(
-												<Input placeholder="店铺游戏名称"/>
+										<FormItem label="Input">
+											{getFieldDecorator("name-1")(
+												<Input />
 											)}
 										</FormItem>
 									</Col>
@@ -125,10 +138,16 @@ class aaaa extends Component {
 										<FormItem>
 											<div style={{"textAlign":"left"}}>
 												<span className="btn-group">
-													<Button htmlType="submit" type="primary">
+													<Button
+														htmlType="submit"
+														type="primary"
+													>
 														查询
 													</Button>
-													<Button htmlType="reset" type="button">
+													<Button
+														htmlType="reset"
+														type="button"
+													>
 														重置
 													</Button>
 												</span>
@@ -144,8 +163,36 @@ class aaaa extends Component {
 						<div className="cell cell-1">
 							<div style={{"textAlign":"right"}}>
 								<span className="btn-group">
-									<Button htmlType="button" type="primary" onClick={() => {() => this.onShowModal('AddModal');}}>
-										添加游戏
+									<Button
+										htmlType="button"
+										disabled={this.state.selectedRowKeys.length === 0}
+										onClick={() => {
+											const { selectedRows } = this.state;
+											const params = selectedRows.reduce((arr, item) => {
+												const _temp = {};
+												["id"].forEach((pk) => {
+													_temp[pk] = item[pk];
+												});
+												arr.push(_temp);
+												return arr;
+											}, []);
+											this.execFetchApi('editGame', params);
+										}}
+									>
+										批量
+									</Button>
+									<Button
+										htmlType="button"
+										type="primary"
+										onClick={() => {() => this.onShowModal('AddModal');}}
+									>
+										新增
+									</Button>
+									<Button
+										htmlType="button"
+										onClick={() => this.props.history.push('https://www.baidu.com/')}
+									>
+										跳转
 									</Button>
 								</span>
 							</div>
@@ -164,7 +211,16 @@ class aaaa extends Component {
 									onShowSizeChange: this.onShowSizeChange,
 								}}
 								rowKey="id"
-								rowSelection={{"type":"checkbox"}}
+								rowSelection={{
+									type: checkbox,
+									selectedRowKeys: this.state.selectedRowKeys,
+									onChnage: (selectedRowKeys, selectedRows) => {
+										this.setState({
+											selectedRowKeys,
+											selectedRows,
+										});
+									}
+								}}
 							/>
 						</div>
 					</div>

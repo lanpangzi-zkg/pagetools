@@ -7,6 +7,7 @@ class AddModal extends Component {
 		this.state = {
 			loading: false,
 		};
+		this.execFetchApi = this.execFetchApi.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
 		this.onError = this.onError.bind(this);
 		this.onToggleLoading = this.onToggleLoading.bind(this);
@@ -55,6 +56,16 @@ class AddModal extends Component {
 		this.setState({
 			loading: !this.state.loading,
 		});
+	}
+	execFetchApi(api, params) {
+		const { dispatch } = this.props;
+		this.onToggleLoading();
+		dispatch({
+			type: `aaaa/${api}`,
+			payload: params,
+		}).then(() => {
+			this.onToggleLoading();
+		}).catch(this.onError);
 	}
 	onSubmit(e) {
 		e && e.preventDefault();
@@ -122,7 +133,7 @@ class AddModal extends Component {
 					onCancel={this.onCancel}
 					onOk={this.onOk}
 					afterClose={this.onResetModal}
-					title="添加游戏"
+					title="添加白名单"
 					width={500}
 				>
 					<Spin spinning={this.state.loading}>

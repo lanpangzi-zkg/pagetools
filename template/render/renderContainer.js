@@ -4,7 +4,7 @@ const renderModal = require('./renderModal');
 const renderHeader = require('./renderHeader');
 const renderTable = require('./renderTable');
 
-const renderContainer = (renderConfig, pageName) => {
+const renderContainer = (renderConfig, pageName, layerConfig) => {
     const { type } = renderConfig;
     let component = null;
     if (!Object.hasOwnProperty.call(renderConfig, 'type')) {
@@ -12,22 +12,22 @@ const renderContainer = (renderConfig, pageName) => {
     }
     switch(type) {
         case 'FormContainer':
-            component = renderForm(renderConfig);
+            component = renderForm(renderConfig, layerConfig);
             break;
         case 'LineContainer':
             component = renderLine();
             break;
         case 'TableContainer':
-            component = renderTable(renderConfig, pageName);
+            component = renderTable(renderConfig, pageName, layerConfig);
             break;
         case 'BoxContainer':
-            component = renderBox(renderConfig);
+            component = renderBox(renderConfig, layerConfig);
             break;
         case 'ModalContainer':
-            component = renderModal(renderConfig);
+            component = renderModal(renderConfig, layerConfig);
             break;
         case 'HeaderContainer':
-            component = renderHeader(renderConfig);
+            component = renderHeader(renderConfig, layerConfig);
             break;
         default:
             break;

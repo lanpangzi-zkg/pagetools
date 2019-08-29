@@ -13,7 +13,7 @@ const renderEnter = (fileConfig, pageName, isMainPage = false) => {
     }
     const renderStrArr = [];
     layoutConfig.forEach((config) => {
-        renderStrArr.push(renderWidget(config, pageName));
+        renderStrArr.push(renderWidget(config, pageName, layerConfig));
     });
 
     if (isMainPage) { // 是主页面，渲染modal到主视图

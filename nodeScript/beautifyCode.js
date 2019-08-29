@@ -94,29 +94,21 @@ const getNewLine = (line) => {
 	if (especialTag) {
 		return addWhiteSpace(_line, curLineSpace - 1);
 	}
-
 	const startTag = isStartTag(_line);
 	if (startTag) { // 只包含开始标签
 		tagStack.push(curLineSpace);
 		curLineSpace++;
 		return addWhiteSpace(_line, curLineSpace - 1);
 	}
-	
 	const wholeBracket = isWholeBracket(_line);
 	if (wholeBracket) { // 包含起始圆括号
 		return addWhiteSpace(_line, curLineSpace);
-	}
-	if (_line === 'gamePageList: result.data &&  Array.isArray(result.data.list) ? result.data.list: [],') {
-		console.log(1);
 	}
 	const endTag = isEndTag(_line);
 	if (endTag) { // 只包含结束标签
 		const lineSpace = tagStack.pop() || 0;
 		curLineSpace = lineSpace;
 		return addWhiteSpace(_line, curLineSpace);
-	}
-	if (_line === 'gamePageList: result.data &&  Array.isArray(result.data.list) ? result.data.list: [],') {
-		console.log(2);
 	}
 	const tagWithWrap = isTagWithWrap(_line);
 	if (tagWithWrap) { // 开始标签折行

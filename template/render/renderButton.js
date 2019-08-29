@@ -1,6 +1,6 @@
 const { getProps } = require('../function/propsUtil');
 
-const renderButton = (config) => {
+const renderButton = (config, layerConfig) => {
     const { buttonArr = [], textAlign = 'left', cellStyles = {} } = config;
     const styleObj = Object.assign({}, cellStyles, { textAlign });
     return `<div style={${JSON.stringify(styleObj)}}>
@@ -10,7 +10,9 @@ const renderButton = (config) => {
                 if (expandFlag === '1') {
                     return getExpandBtn(btn);
                 } else {
-                    return `<Button${getProps(btn, 'Button')}>
+                    return `<Button
+                        ${getProps(btn, 'Button', layerConfig)}
+                    >
                         ${btnText}
                     </Button>`;
                 }
