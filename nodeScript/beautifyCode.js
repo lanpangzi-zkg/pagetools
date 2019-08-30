@@ -9,11 +9,18 @@ const deleteWhiteSpace = (line) =>  {
 };
 
 const isStartTag = (line) => {
+	if (line.indexOf('models:()') >= 0) {
+		return true;
+	}
 	return matchWithLine(line, /^<[^\/].+>$|\)??\s*?{$|[^\)]\($|^\{*.+\)\($/);
 };
 
+/**
+ * 匹配 </...>|};|}...;|});|/>|],
+ * @param {*} line 
+ */
 const isEndTag = (line) => {
-	return matchWithLine(line, /<\/.+>$|}[;,]?$|\);?$|}?\);?$|\/>/);
+	return matchWithLine(line, /<\/.+>$|}[;,]?$|}.*;$|\);?$|}?\);?$|\/>|],$/);
 };
 
 /**

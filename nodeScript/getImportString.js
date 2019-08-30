@@ -57,7 +57,7 @@ const getAntdImportString = (layoutConfig = []) => {
 const getOtherImportString = (antdImportSets) => {
     const antherImports = [];
     if (antdImportSets.has('RangePicker') || antdImportSets.has('DatePicker')) {
-        antherImports.push("import moment from 'monent';");
+        antherImports.push("import moment from 'moment';");
         antdImportSets.delete('RangePicker');
     }
     if (antdImportSets.has('Table')) {
@@ -66,7 +66,7 @@ const getOtherImportString = (antdImportSets) => {
     }
     if (antdImportSets.has('RangePicker')) {
         antherImports.push('const { RangePicker } = DatePicker;');
-    }    
+    }
     if (antdImportSets.has('TextArea')) {
         antherImports.push('const { TextArea } = Input;');
         antdImportSets.delete('TextArea');

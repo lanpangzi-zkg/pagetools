@@ -109,7 +109,7 @@ const renderTabs = (configs) => {
 
 const renderRadio = (configs) => {
     const { style = {}, radioArr = [] } = configs;
-    return `<Radio.Group style={${JSON.stringify(style)}>
+    return `<Radio.Group style={${JSON.stringify(style)}}>
         ${Array.isArray(radioArr) ? radioArr.map(({ key, label, value }) => {
             return `<Radio key="${key || value}" value="${value}">
                 ${label}
@@ -123,16 +123,27 @@ const renderCheckbox = (configs) => {
     const { style = {}, checkboxArr = [] } = configs;
     const ckStyle = Object.assign({ width: '100%'}, style);
     const optionsStr = JSON.stringify(checkboxArr);
-    return `<CheckboxGroup options={${optionsStr}} style={${JSON.stringify(ckStyle)} />`;
+    return `<Checkbox.Group
+        options={${optionsStr}}
+        style={${JSON.stringify(ckStyle)}}
+    />`;
 };
 const renderDatePicker = (configs) => {
-    const { showTime = false, format } = configs;
-    return `<DatePicker style={{ width: '100%' }}  showTime={${showTime}} format="${format}" />`;
+    const { showTime = false, format = 'YYYY-MM-DD' } = configs;
+    return `<DatePicker
+        style={{ width: '100%' }}
+        showTime={${showTime}}
+        format="${format}"
+    />`;
 };
 
 const renderRangePicker = (configs) => {
-    const { showTime = false, format } = configs;
-    return `<RangePicker style={{ width: '100%' }} showTime={${showTime}} format="${format}" />`;
+    const { showTime = false, format = 'YYYY-MM-DD' } = configs;
+    return `<RangePicker
+        style={{ width: '100%' }}
+        showTime={${showTime}}
+        format="${format}"
+    />`;
 }
 
 module.exports = renderWidget;

@@ -24,7 +24,7 @@ const getCompStyle = (config) => {
 };
 
 const getBtnProps = (btnConfig, layerConfig) => {
-    const { htmlType, antdType, logicType, modalName, skipUrl, api = '' } = btnConfig;
+    const { htmlType, antdType, logicType, modalName, skipUrl = '', api = '' } = btnConfig;
     const propsArr = [];
     if (htmlType) {
         propsArr.push(`htmlType="${htmlType}"`);
