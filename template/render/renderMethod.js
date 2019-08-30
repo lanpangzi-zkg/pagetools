@@ -35,17 +35,27 @@ const getDispatchStr =(form, fileConfig, pageName) => {
 
 const getSubmitValues = (formConfigs, fileConfig = {}) => {
     const { formItemArr = [], editApi } = formConfigs || {};
-    const dateKeys = [];
+    const dateArr = [];
     let dateStr = '';
     formItemArr.forEach((item) => {
         const { type } = item;
         if (type === 'DatePicker' || type === 'RangePicker') {
-            dateKeys.push(item);
+            dateArr.push(item);
         }
     });
-    if (dateKeys.length > 0) {
-        dateStr = dateKeys.reduce((arr, { name, format }) => {
-            arr.push(`values.${name} = values.${name} && values.${name}.format('${format}');`);
+    if (dateArr.length > 0) {
+        dateStr = dateArr.reduce((arr, { type, name, format = 'YYYY-MM-DD', dateKeys }) => {
+            if (type === 'RangePicker' && dateKeys) {
+                const [startKey, endKey] = dateKeys.split(',');
+                arr.push(`if (Array.isArray(values['${name}']) && values['${name}'].length > 0) {
+                    const [ startTime, endTime ] = values['${name}'];
+                    values['${startKey}'] = startTime.format('${format}');
+                    values['${endKey}'] = endTime.format('${format}');
+                    delete values['${name}'];
+                }`);
+            } else {
+                arr.push(`values['${name}'] = values['${name}'] && values['${name}'].format('${format}');`);
+            }
             return arr;
         }, []).join('\n');
     }
@@ -67,12 +77,24 @@ const getSubmitValues = (formConfigs, fileConfig = {}) => {
     return dateStr + '\n' + editParams;
 };
 
-const getFormConfigsByType = (fileConfig, pType ='query') => {
-    const { layoutConfig = [] } = fileConfig;
-    const formConfigs = layoutConfig.find(({ type, formType }) => {
-        return type === 'FormContainer' && formType === pType;
+const getFormConfigsByType = (fileConfig, pType = 'query') => {
+    return getFormArr(fileConfig).find(({ formType }) => {
+        return pType === formType;
     });
-    return formConfigs;
+};
+
+const getFormArr = (fileConfig) => {
+    const { layoutConfig = [] } = fileConfig;
+    const formArr = layoutConfig.reduce((arr, item) => {
+        const { type, cellsArr } = item;
+        if (Array.isArray(cellsArr) && cellsArr.length > 0) {
+            arr.push(...getFormArr({ layoutConfig: cellsArr }));
+        } else if (type === 'FormContainer') {
+            arr.push(item);
+        }
+        return arr;
+    }, []);
+    return formArr;
 };
 
 const renderOpItem = (itemConfigs) => {
@@ -142,6 +164,9 @@ const renderMethod = (extraConfig, fileConfig, pName) => {
                        ${getDispatchStr(form, fileConfig, pName || pageName)}
                     }
                 });
+            }
+            onResetForm = () => {
+                this.props.form.resetFields();
             }
         `);
     }

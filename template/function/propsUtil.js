@@ -67,6 +67,8 @@ const getBtnProps = (btnConfig, layerConfig) => {
         }}`);
     } else if (logicType === 'skip') {
         propsArr.push(`onClick={() => this.props.history.push('${skipUrl}')}`);
+    } else if (logicType === 'reset') {
+        propsArr.push(`onClick={this.onResetForm}`);
     }
     if (propsArr.length > 0) {
         return ` ${propsArr.join('\n')}`;
@@ -83,7 +85,7 @@ const getInputProps = (inputConfig) => {
 };
 
 const getFormItemOptions = (config) => {
-    const { required, initialValue, label, type } = config;
+    const { required, label, type } = config;
     const propsArr = [];
     if (required == 1) {
         const prefixLabel = type === 'Input' || type === 'TextArea' ? '请输入' : '请选择';

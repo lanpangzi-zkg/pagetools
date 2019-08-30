@@ -24,8 +24,8 @@ const renderModalFormData = (fileConfig) => {
                 }
             }
         }
-        onInitForm() {
-            const { editData, form } = this.props;
+        onInitForm(editData) {
+            const { form } = this.props;
             ${onInitForm(layoutConfig)}
         }
     `;
@@ -38,21 +38,28 @@ const onInitForm = (layoutConfig) => {
     if (formConfigs) {
         const { formItemArr = [] } = formConfigs;
         const formKeys = [];
-        const dateKeys = [];
+        const dateArr = [];
         let dateStr = '';
         formItemArr.forEach((item) => {
             const { name, type } = item;
             if (type === 'DatePicker' || type === 'RangePicker') {
-                dateKeys.push(item);
+                dateArr.push(item);
             } else {
                 formKeys.push(`'${name}'`);
             }
         });
-        if (dateKeys.length > 0) {
-            dateStr = dateKeys.reduce((arr, {name, format}) => {
-                arr.push(`if (editData.${name}) {
-                    formData.${name} = moment(editData.${name}, '${format}');
-                }`);
+        if (dateArr.length > 0) {
+            dateStr = dateArr.reduce((arr, { type, name, format, dateKeys }) => {
+                if (type === 'RangePicker' && dateKeys) {
+                    const [startKey, endKey] = dateKeys.split(',');
+                    arr.push(`if (editData['${startKey}'] && editData['${endKey}']) {
+                        formData['${name}'] = [moment(editData['${startKey}'], '${format}'), moment(editData['${endKey}'], '${format}')];
+                    }`);
+                } else {
+                    arr.push(`if (editData['${name}']) {
+                        formData['${name}'] = moment(editData['${name}'], '${format}');
+                    }`);
+                }
                 return arr;
             }, []).join('\n');
         }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Form, Row, Col, Input, Modal, Spin, message } from 'antd';
+import { Form, Row, Col, Input, DatePicker, Modal, Spin, message } from 'antd';
+import moment from 'monent';
 const FormItem = Form.Item;
 class AddModal extends Component {
 	constructor(props) {
@@ -40,12 +41,15 @@ class AddModal extends Component {
 			}
 		}
 	}
-	onInitForm() {
-		const { editData, form } = this.props;
+	onInitForm(editData) {
+		const { form } = this.props;
 		const formData = ['gameId','gameName','flGameName'].reduce((obj, dataKey) => {
 			obj[dataKey] = editData[dataKey];
 			return obj;
 		}, {});
+		if (editData['a']) {
+			formData['a'] = moment(editData['a'], 'YYYY-MM-DD');
+		}
 		form.setFieldsValue(formData);
 		this.initEdit = true;
 	}
@@ -74,6 +78,7 @@ class AddModal extends Component {
 			if (!err) {
 				const { mode = 'add' } = this.props;
 				const disptachType = mode === 'add' ? 'aaaa/createGame' : 'aaaa/editGame';
+				values['a'] = values['a'] && values['a'].format('YYYY-MM-DD');
 				if (mode === 'edit') {
 					values.id = editData.id;
 				}
@@ -91,6 +96,9 @@ class AddModal extends Component {
 				}).catch(this.onError);
 			}
 		});
+	}
+	onResetForm = () => {
+		this.props.form.resetFields();
 	}
 	onHiddenModal = (modalName, updateList) => {
 		this.setState({
@@ -138,9 +146,9 @@ class AddModal extends Component {
 				>
 					<Spin spinning={this.state.loading}>
 						<Form onSubmit={this.onSubmit} layout="inline">
-							<Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+							<Row gutter={{ md: 24, lg: 24, xl: 48 }}>
 								<Col md={24} sm={24}>
-									<FormItem label="店铺游戏ID">
+									<FormItem label="店铺游戏ID" labelCol={{span: 6}} wrapperCol ={{span: 14}}>
 										{getFieldDecorator("gameId", {
 											rules: [{ required: true, message: "请输入店铺游戏ID" }],
 										})(
@@ -149,7 +157,7 @@ class AddModal extends Component {
 									</FormItem>
 								</Col>
 								<Col md={24} sm={24}>
-									<FormItem label="店铺游戏名称">
+									<FormItem label="店铺游戏名称" labelCol={{span: 6}} wrapperCol ={{span: 14}}>
 										{getFieldDecorator("gameName", {
 											rules: [{ required: true, message: "请输入店铺游戏名称" }],
 										})(
@@ -158,11 +166,18 @@ class AddModal extends Component {
 									</FormItem>
 								</Col>
 								<Col md={24} sm={24}>
-									<FormItem label="游戏名称">
+									<FormItem label="游戏名称" labelCol={{span: 6}} wrapperCol ={{span: 14}}>
 										{getFieldDecorator("flGameName", {
 											rules: [{ required: true, message: "请输入游戏名称" }],
 										})(
 											<Input />
+										)}
+									</FormItem>
+								</Col>
+								<Col md={24} sm={24}>
+									<FormItem label="DatePicker" labelCol={{span: 6}} wrapperCol ={{span: 14}}>
+										{getFieldDecorator("a")(
+											<DatePicker style={{ width: '100%' }}  showTime={false} format="YYYY-MM-DD" />
 										)}
 									</FormItem>
 								</Col>
