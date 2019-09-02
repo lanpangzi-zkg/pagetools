@@ -1,7 +1,7 @@
 const getApiName = require('../function/getApiName');
 
 const concatReqUrl = (requestHost, requestApi) => {
-    return `"${requestHost}${requestApi}"`;
+    return `window.configs.host.${requestHost} + "${requestApi}"`;
 };
 
 const renderService = ({ layerConfig }) => {
