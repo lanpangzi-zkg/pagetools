@@ -53,7 +53,8 @@ router.post('/user/login2', async (ctx, next) => {
 	const { code } = JSON.parse(result.body);
 	// 登录失败
 	if (code != '0') {
-		ctx.body = result.body;
+		// ctx.body = result.body;
+		ctx.body = '登录失败' + JSON.stringify(options);
 	} else {
 		const setCookie = result.headers['set-cookie'];
 		if (Array.isArray(setCookie)) {
