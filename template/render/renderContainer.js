@@ -18,7 +18,7 @@ const renderContainer = (renderConfig, pageName, layerConfig) => {
             component = renderLine();
             break;
         case 'TableContainer':
-            component = renderTable(renderConfig, pageName, layerConfig);
+            component = renderTable(renderConfig, layerConfig);
             break;
         case 'BoxContainer':
             component = renderBox(renderConfig, layerConfig);

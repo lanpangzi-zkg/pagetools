@@ -202,17 +202,25 @@ const renderMethod = (extraConfig, fileConfig, pName) => {
         `);
     }
     if (table && table.pagination) {
+        let pIndexKey = 'PageIndex';
+        let pSizeKey = 'PageSize';
+        if (table.apiObj) {
+            const { paginationParams } = table.apiObj;
+            const [ pIndex, pSize ] = paginationParams.split('/');
+            pIndexKey = pIndex;
+            pSizeKey = pSize;
+        }
         methodStrArr.push(`
         onPageIndexChange = (page, pageSize) => {
             this.setState({
-                PageIndex: page,
-                PageSize: pageSize,
+                ${pIndexKey}: page,
+                ${pSizeKey}: pageSize,
             })
         }
         onShowSizeChange = (current, size) => {
             this.setState({
-                PageIndex: current,
-                PageSize: size,
+                ${pIndexKey}: current,
+                ${pSizeKey}: size,
             });
         }
         `);

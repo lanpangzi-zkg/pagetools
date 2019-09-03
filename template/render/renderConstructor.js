@@ -13,9 +13,17 @@ const renderConstructor = (extraConfig, isModal) => {
     }
     if (table) {
         if (table.pagination) {
+            let pIndexKey = 'PageIndex';
+            let pSizeKey = 'PageSize';
+            if (table.apiObj) {
+                const { paginationParams } = table.apiObj;
+                const [ pIndex, pSize ] = paginationParams.split('/');
+                pIndexKey = pIndex;
+                pSizeKey = pSize;
+            }
             stateArr.push(`
-                PageIndex: 1,
-                PageSize: 10,
+                ${pIndexKey}: 1,
+                ${pSizeKey}: 10,
             `);
         }
         if (table.rowSelection) {

@@ -18,10 +18,12 @@ router.get('/sourceCache/:filename', async (ctx) => {
 	const filename = ctx.params.filename;
 	ctx.set('Content-Type', 'text/plain;charset=utf-8');
 	ctx.set('Content-Disposition', `attachment;filename=${filename}`);
-	const filePath = path.resolve(__dirname, `sourceCache/${filename}`);
-	const code = await fs.readFileSync(filePath);
-	ctx.body = code;
-	fs.remove(filePath);
+	const tarFilePath = path.resolve(__dirname, `sourceCache/${filename}`);
+	const file = await fs.readFileSync(tarFilePath);
+	ctx.body = file;
+	fs.remove(tarFilePath);
+	const [ sourceCacheDir ] = filename.split('.');
+	fs.remove(path.resolve(__dirname, `sourceCache/${sourceCacheDir}`));
 });
 
 app.use(bodyparser());
@@ -114,7 +116,6 @@ router.post('/fetchApi', async (ctx, next) => {
 	ctx.set('Access-Control-Allow-Headers', 'Content-Type');
 	ctx.set('Content-Type', 'application/json');
 	const options = getFetchApiOption(ctx);
-	console.log(options);
 	const { body, statusCode } = await porxyRequest(ctx, options, ctx.body.params);
 	ctx.status = statusCode;
 	ctx.body = body;

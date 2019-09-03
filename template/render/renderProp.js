@@ -14,8 +14,16 @@ const renderProp = (extraConfig) => {
     if (table) {
         const { modelKey = '', pagination } = table;
         if (pagination) {
+            let pIndexKey = 'PageIndex';
+            let pSizeKey = 'PageSize';
+            if (table.apiObj) {
+                const { paginationParams } = table.apiObj;
+                const [ pIndex, pSize ] = paginationParams.split('/');
+                pIndexKey = pIndex;
+                pSizeKey = pSize;
+            }
             strArr.push(`
-                const { PageIndex, PageSize } = this.state;
+                const { ${pIndexKey}, ${pSizeKey} } = this.state;
                 const { ${modelKey}Total, ${modelKey} } = this.props.${pageName};
             `);
         } else {

@@ -1,12 +1,13 @@
 let extraConfig = {};
 
-const getImportString = (layoutConfig = [], layerConfig = [], initImports = []) => {
+const getImportString = (layoutConfig = [], layerConfig = {}, initImports = []) => {
     extraConfig = {};
     const results = new Array(2);
-    const antdImportSets = conbine(getAntdImportString(layoutConfig), new Set(initImports));
+    const { modalArr = [], apiArr = [] } = layerConfig;
+    const antdImportSets = conbine(getAntdImportString(layoutConfig, apiArr), new Set(initImports));
     results[1] = Object.assign({}, extraConfig);
     const otherImportSets = getOtherImportString(antdImportSets);
-    const { modalArr = [] } = layerConfig;
+    
     const modalImports = initImports.indexOf('Modal') >= 0 ? '' : modalArr.reduce((arr, { name }) => {
         arr.push(`import ${name} from './${name}';`);
         return arr;
@@ -23,7 +24,7 @@ function conbine(setA, setB) {
     return setA;
 }
 
-const getAntdImportString = (layoutConfig = []) => {
+const getAntdImportString = (layoutConfig = [], apiArr) => {
     const antdImportSets = new Set();
     layoutConfig.forEach((item) => {
         if (item.type === 'FormContainer') {
@@ -37,6 +38,12 @@ const getAntdImportString = (layoutConfig = []) => {
             });
         } else if (item.type === 'TableContainer') {
             extraConfig.table = item;
+            if (item.modelKey) {
+                const apiObj = apiArr.find((api) => {
+                    return api.modelKey === item.modelKey;
+                });
+                item.apiObj = apiObj;
+            }
             if (item && item.hasOperation && item.operationArr.length > 1) {
                 antdImportSets.add('Divider');
             }
