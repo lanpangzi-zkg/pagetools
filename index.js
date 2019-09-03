@@ -43,30 +43,34 @@ router.get('/appLogin', async (ctx, next) => {
 // 登录
 router.post('/user/login2', async (ctx, next) => {
 	await next();
-	const { authUrl, Password, UserName, RememberMe } = ctx.body;
-	const params = { Password, UserName, RememberMe };
-	const options = getRquestOptions(authUrl, '/user/login2', 'POST', 'json', '', params);
-	if (!options) {
-		ctx.body = 'url参数不正确';
-	}
-	const result = await porxyRequest(ctx, options, params);
-	const { code } = JSON.parse(result.body);
-	// 登录失败
-	if (code != '0') {
-		// ctx.body = result.body;
-		ctx.body = '登录失败' + JSON.stringify(options);
-	} else {
-		const setCookie = result.headers['set-cookie'];
-		if (Array.isArray(setCookie)) {
-			result.headers['set-cookie'] = setCookie.reduce((arr, cookieStr) => {
-				arr.push(cookieStr.replace(/\s?secure;/, ''));
-				return arr;
-			}, []);
+	try {
+		const { authUrl, Password, UserName, RememberMe } = ctx.body;
+		const params = { Password, UserName, RememberMe };
+		const options = getRquestOptions(authUrl, '/user/login2', 'POST', 'json', '', params);
+		if (!options) {
+			ctx.body = 'url参数不正确';
 		}
-		Object.keys(result.headers).forEach((k) => {
-			ctx.set(k, result.headers[k]);
-		});
-		ctx.body = result.body;
+		const result = await porxyRequest(ctx, options, params);
+		const { code } = JSON.parse(result.body);
+		// 登录失败
+		if (code != '0') {
+			// ctx.body = result.body;
+			ctx.body = '登录失败' + JSON.stringify(options);
+		} else {
+			const setCookie = result.headers['set-cookie'];
+			if (Array.isArray(setCookie)) {
+				result.headers['set-cookie'] = setCookie.reduce((arr, cookieStr) => {
+					arr.push(cookieStr.replace(/\s?secure;/, ''));
+					return arr;
+				}, []);
+			}
+			Object.keys(result.headers).forEach((k) => {
+				ctx.set(k, result.headers[k]);
+			});
+			ctx.body = result.body;
+		}
+	} catch(e) {
+		ctx.body = '异常：' + JSON.stringify(e);
 	}
 });
 
