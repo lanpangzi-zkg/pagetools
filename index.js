@@ -114,6 +114,7 @@ router.post('/fetchApi', async (ctx, next) => {
 	ctx.set('Access-Control-Allow-Headers', 'Content-Type');
 	ctx.set('Content-Type', 'application/json');
 	const options = getFetchApiOption(ctx);
+	console.log(options);
 	const { body, statusCode } = await porxyRequest(ctx, options, ctx.body.params);
 	ctx.status = statusCode;
 	ctx.body = body;
