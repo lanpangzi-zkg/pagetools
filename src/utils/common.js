@@ -30,6 +30,9 @@ function getProxyHeaders(reqUrl, method, acceptType, cookie, requestData) {
 }
 
 function getRquestOptions(reqUrl, path, method = 'POST', acceptType = 'json', cookie = '', requestData = '') {
+    if (!reqUrl) {
+        return null;
+    }
     const urlObj = url.parse(reqUrl);
     const options = {
         hostname: urlObj.hostname,

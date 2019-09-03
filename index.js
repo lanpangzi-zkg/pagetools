@@ -46,6 +46,9 @@ router.post('/user/login2', async (ctx, next) => {
 	const { authUrl, Password, UserName, RememberMe } = ctx.body;
 	const params = { Password, UserName, RememberMe };
 	const options = getRquestOptions(authUrl, '/user/login2', 'POST', 'json', '', params);
+	if (!options) {
+		ctx.body = 'url参数不正确';
+	}
 	const result = await porxyRequest(ctx, options, params);
 	const { code } = JSON.parse(result.body);
 	// 登录失败
@@ -143,7 +146,7 @@ router.post('/generatePage', async (ctx, next) => {
 app
 	.use(router.routes())
 	.use(router.allowedMethods())
-	.use(async (ctx) => { // 解析post请求参数
+	.use(async (ctx) => {
     	ctx.body =  ctx.request.body;
 });
 
